@@ -1,11 +1,24 @@
 <h2>Welcome</h2>
-Welcome to TestUp, the SketchUp Testing Portal. Click a tab from the list
-above to find the tests you would like to run.
+<b>Welcome to TestUp, the SketchUp Developer Tools test runner. This little
+window lets you run unit tests written in Ruby, right inside SketchUp.</b>
 
-<p>TestUp provides a framework and GUI for running unit tests
-on the SketchUp Ruby API. The front-end is displayed in a SketchUp web dialog
-and tests are run in the standard Ruby unit test distribution.
+<p>See those tabs along the top? Each contains a set of tests you can run
+right now. Tests appear as checkboxes. See the example one below?
+Click the "GO" button to watch it turn green (meaning the test passed.)
 
-<p>
+<p>You get the idea. Select one or more tests, push "GO", and see if
+the tests pass. If there's a problem, you can click on the name of the
+test to get more information.
 
+<P>To add tests of your own, go check out 
+&lt;yourpluginsfolder&gt;/sketchup-developer-tools/testup/tests. In that
+folder you'll find several sub-folders that match the tabs. Any
+.rb file that is added to those folders will be parsed for unit tests.
+Read the file in test/tests/bugs/TC_NEW_BUG.rb for a copy-and-paste
+example.
+
+<P>Ideally, you'll share your tests as an addition to our github repo, so that
+everyone can benefit, and we all can avoid regressions. Visit http://www.github.com/SketchUp/sketchup-developer-tools for details.
+
+<P>
 
