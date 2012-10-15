@@ -1,0 +1,200 @@
+/**
+2: Copyright:: Copyright 2012 Trimble Navigation Ltd.
+3: License:: Apache License, version 2.0
+4: Original Author:: Matt Lowrie
+
+CSS styling for the TestUp GUI.
+*/
+body {
+  font-family: Arial, sans-serif;
+  font-size: 10pt;
+  background-color: #f0eee7;
+  border: 0px;
+  background-image: url('testup.gif');
+  background-repeat: repeat-x;
+  background-position: 0px -1400px;
+  padding: 0px 0px 50px 100px;
+  margin: 0px;
+}
+h2 {
+  margin-bottom: 3px;
+}
+/* GUI elements */
+#headsUpDisplay {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100px;
+  height: 100%;
+  display: inline;
+  background-image: url('testup.gif');
+  background-position: 0px 0px;
+  height: 800px;
+  padding-top: 165px;
+}
+#divGui div {
+  margin: 0;
+  padding-right: 20px;
+}
+#divTarget {
+  font-size: 9pt;
+  margin-bottom: 15px;
+}
+#divTarget select {
+  font-family: 'Courier New';
+}
+#divTarget a {
+  font-size: 80%;
+  margin-left: 10px;
+  color: red
+}
+#btnRunTests {
+  position: absolute;
+  top: 100px;
+  left: 15px;
+  z-index: 100;
+  width: 70px;
+  height: 40px;
+  background-image: url('testup.gif');
+  background-position: -115px -465px;
+  background-color: none;
+  text-decoration: none;
+}
+#btnRunTests:hover {
+  background-position: -115px -515px;
+}
+#divResultControls a {
+  margin-right: 10px;
+}
+/* Tabbed navigation */
+.nav ul {
+  list-style-type: none;
+  margin: 0;
+  height: 65px;
+  background-image: url('testup.gif');
+  background-position: -100px 0px;
+  background-repeat: no-repeat;
+  padding-left: 110px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.nav ul li {
+  margin-top: 38px;
+  margin-right: 5px;
+  float: left;
+  width: auto;
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+.nav ul li a {
+  padding: 4px 8px 3px 8px;
+  border-left: 1px solid #b9b5af;
+  border-right: 1px solid #b9b5af;
+  display: block;
+  color: #000;
+  text-decoration: none;
+  background-image: url('testup.gif');
+  background-position: 0px -1350px;
+  background-repeat: repeat-x;
+  
+}
+.nav ul li a.on {
+  border-left: 1px solid #9a9894;
+  border-right: 1px solid #9a9894;
+  background-position: -0px -1375px;
+  padding-bottom: 5px;
+}
+.nav ul li a:hover {
+  background-position: -0px -1375px;
+}
+/* View panel divs */
+.view {
+  clear: both;
+}
+.view a {
+  color: black;
+}
+.view .result {
+  font-size: 10pt;
+  padding: 12px;
+  border-left: 1px inset;
+  left: 12px;
+  position: relative;
+}
+.view .result a {
+  text-decoration: underline;
+  color: #00f;
+}
+.view .failMsg {
+  background-color: #bff;
+}
+.view .failMsg a {
+  text-decoration: underline;
+}
+/* Status colors */
+.fail {
+  background-color: red;
+}
+.pass {
+  background-color: #0f0;
+}
+.warn {
+  background-color: yellow;
+}
+
+#headsUpDisplay span {
+  position: absolute;
+  width: 75px;
+  height: 40px;
+  left: 0px;
+  background-color: transparent;
+  display: block;
+  font-size: 14px;
+  line-height: 40px;
+  text-align: center;
+  background-image: url('testup.gif');
+  background-repeat: repeat-x;
+  font-weight: bold;
+}
+
+#headsUpDisplay .pass {
+  top: 299px;
+  background-color: transparent;
+  background-position: -100px -200px;
+}
+
+#headsUpDisplay .warn {
+  top: 232px;
+  background-color: transparent;
+  background-position: -100px -150px;
+}
+
+#headsUpDisplay .fail {
+  top: 165px;
+  background-color: transparent;
+  background-position: -100px -100px;
+}
+
+#percentages {
+  position: absolute;
+  width: 75px;
+  left: 0px;
+  top: 360px;
+  color: #333333;
+  background-color: transparent;
+  background-position: -100px -250px;
+  font-weight: normal;
+  font-size: 10px;
+  padding: 9px 0px 0px 9px;
+}
+
+.wtf {
+  background-color: magenta;
+}
+.alert {
+  background-color: red;
+}
+.statusWarn {
+  color: red;
+  font-weight: bold;
+}
