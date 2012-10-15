@@ -1,0 +1,13 @@
+SketchUp Developer Tools Extension
+Copyright 2012 Trimble Navigation Ltd. (http://www.trimble.com)
+
+Developed by the SketchUp team at Trimble. (http://www.sketchup.com/)
+
+A few ruby libraries were built by others:
+
+The timeout.rb library is copyright (C) 2000 Network Applied Communication
+Laboratory, Inc. and (C) 2000 Information-technology Promotion Agency, Japan
+
+The unit.rb library and related files are copyright (c) 2000-2003, Nathaniel
+Talbott. Distributed by permission under the Ruby license: 
+http://www.ruby-lang.org/en/about/license.txt

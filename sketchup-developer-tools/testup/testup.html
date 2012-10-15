@@ -1,0 +1,226 @@
+<!--
+Copyright:: Copyright 2012 Trimble Navigation Ltd.
+License:: Apache License, version 2.0
+Original Author:: Matt Lowrie
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>TestUp</title>
+    <link rel="stylesheet" href="css/testup.css" type="text/css" />
+    <script type="text/javascript">
+    // Copyright 2012 Trimble Navigation Ltd.  All Rights Reserved.
+    
+    /**
+     * @fileoverview Javascript that drives the front-end of TestUp.
+     * @author Matt Lowrie
+     */
+    
+    /**
+     * Globals.
+     */
+    // Keeps track of preferences for the current user.
+    TESTUP_prefs = {'user':{}, 'session':{}};
+    TESTUP_elements = {};
+    
+    /**
+     * Passes data to the Ruby plugin.
+     * @param {string} funcName The Ruby callback name to call.
+     * @param {string} param Additional data to pass to the callback. Multiple
+     *     params should be comma-separated (,) and will be split on the Ruby side.
+      */
+    function callRuby(funcName, param){
+      cmd = 'skp:' + funcName;
+      if(param)
+        cmd += '@' + param;
+      window.location.href = cmd;
+    }
+    
+    /**
+     * Initializes the page.
+     */
+    function bodyLoad(){
+      TESTUP_elements.gui = document.getElementById('divGui');
+      // Tell the Ruby plugin that the front-end is ready.
+      callRuby('gui_ready')
+    }
+    
+    /**
+     * Builds a selectable list of Ruby tests to run in the GUI.
+     * @param {Object} data A JSON data structure the directory tree of Ruby
+     *     tests to put in the GUI. Contains a hash called where the keys are
+     *     directory names, and their value a hash containing a string called
+     *     "intro" and an array called "tests" of ruby file names to run.
+     */
+    function createGui(data){
+
+      // Main navigation div element
+      var divNav = document.createElement('div');
+      divNav.id = 'divTestCaseNav';
+      divNav.className = 'nav';
+  
+      // Unordered list element for tabbed navigation
+      var ulNav = document.createElement('ul');
+      ulNav.id = 'ulTestCaseNav';
+ 
+      // Create an alphabetical list of the tabs to generate.
+      var alphabeticalDirPaths = [];
+      for(var dirPath in data) {
+        alphabeticalDirPaths.push(dirPath);
+      }
+      alphabeticalDirPaths.sort();
+
+      // Generate the tabs.
+      for(var i=0; i < alphabeticalDirPaths.length; i++){
+        var dirPath = alphabeticalDirPaths[i];
+        // Save the first directory as the selected tab for now
+        if (!TESTUP_prefs.session.selectedTab)
+          TESTUP_prefs.session.selectedTab = dirPath;
+    
+        // Each directory name is a list item that is CSS'd into tab navigation
+        var li = document.createElement('li');
+        var anchor = document.createElement('a');
+        anchor.href = '#';
+        anchor.id = dirPath;
+        var label = dirPath.split('/')[dirPath.split('/').length - 1];
+        label = label.replace(/_/gi, ' ');
+        anchor.innerHTML = label;
+        li.appendChild(anchor);
+        anchor.onclick = function(){tabClick(this);};
+        ulNav.appendChild(li);
+        
+        createView(dirPath, data[dirPath]['tests'], data[dirPath]['intro']);
+      }
+      divNav.appendChild(ulNav);
+      // Views are already attached, so insert the nav before all elements
+      TESTUP_elements.gui.insertBefore(divNav, TESTUP_elements.gui.childNodes(0));
+    
+      document.getElementById(TESTUP_prefs.session.selectedTab).className = 'on';
+      document.getElementById('v_' + TESTUP_prefs.session.selectedTab).style.display = '';
+    //    document.getElementById('divData').innerHTML = msg;
+    }
+    
+    /**
+    * Create a selectable GUI for all files in a specific directory.
+    */
+    function createView(dirName, fileList, html){
+      // Create a corresponding view of test cases
+      var divView = document.createElement("div");
+      divView.id = 'v_' + dirName;
+      divView.className = 'view';
+      divView.style.display = 'none';
+      divView.innerHTML = html;
+
+      for( var i=0, len=fileList.length; i < len; ++i) {
+       var filePath = fileList[i];
+       var fileName = filePath.split('/')[filePath.split('/').length - 1];
+       var checkbox = document.createElement('input');
+       checkbox.type = 'checkbox';
+       checkbox.id = 'cbx_' + fileName;
+       checkbox.alt = filePath;
+       checkbox.checked = true;  // IE 7
+       checkbox.defaultChecked = true;  // IE 6
+       checkbox.name = 'tests';
+       
+       var item = document.createElement('a');
+       item.href='#';
+       item.id = fileName;
+       item.innerHTML = fileName;
+       
+       var resultDiv = document.createElement('div')
+       resultDiv.id = fileName + '_results';
+       resultDiv.className = 'result';
+       resultDiv.innerHTML = '<span style="color:#666">Not run</span>';
+       resultDiv.style.display = 'none';
+      
+       var lineBreak = document.createElement('br');
+       
+       divView.appendChild(checkbox);
+       divView.appendChild(item);
+       item.onclick = function(){toggleResults(this.id); return false;};
+       divView.appendChild(lineBreak);
+       divView.appendChild(resultDiv);
+      }
+      // Attach the view even if there are no files because 
+      // we need the css style to complete the GUI.
+      TESTUP_elements.gui.appendChild(divView)
+    }
+    
+    function toggleResults(testCase){
+      var resultDiv = document.getElementById(testCase + '_results');
+      resultDiv.style.display = (resultDiv.style.display == '') ? 'none' : '';
+    }
+    
+    /**
+     * Iterates all checkbox elements in the currently selected GUI tab and returns
+     * a list of the selected ones.
+     * @return {Array} An array of alt tag values from each checked checkbox in 
+     * the GUI. Each indicie contains the full file path of the corresponding test
+     * case file. An empty array is returned if no GUI checkboxes are selected.
+     */
+    function findCheckedTests(){
+      var testList = [];
+      var divs = TESTUP_elements.gui.getElementsByTagName('div');
+      for (var divIndex = 0, divElement; divElement = divs[divIndex]; ++divIndex) {
+        if (divElement.className == 'view' && divElement.style.display == '') {
+          var inputs = divElement.getElementsByTagName('input');
+          for (var i = 0, input; input = inputs[i]; ++i) {
+            if (input.checked && input.getAttribute("alt"))
+              testList.push(input.getAttribute("alt"));
+          }
+        }
+      }
+      return testList;
+    }
+    
+    /**
+    * Handler for when a navigation tab is clicked.
+    */
+    function tabClick(anchor){
+      if ( anchor.id == TESTUP_prefs.session.selectedTab )
+        return;
+      
+      // Clear any results.
+      setGuiElementProperty('headsUpDisplay', 'innerHTML', '');
+
+      var prevSelectedTab = document.getElementById(TESTUP_prefs.session.selectedTab);
+      prevSelectedTab.className = '';
+      anchor.className = 'on';
+      TESTUP_prefs.session.selectedTab = anchor.id;
+      //savePref('tab', anchor.id);
+      
+      var allDivs = TESTUP_elements.gui.getElementsByTagName('div');
+      for ( var i = 0; i < allDivs.length; ++i ) {
+        var theDiv = allDivs[i];
+        if ( theDiv.className == 'view' )
+          theDiv.style.display = ('v_' + anchor.id == theDiv.id) ? '' : 'none';
+      }
+    }
+    
+    function run(){
+      var selected_test_list = findCheckedTests();
+      if ('' == selected_test_list) {
+        alert('Please select at least one test case to run.');
+      } else {
+        // To handle large data sets, we store the params to pass inside a
+        // hidden field called 'run_list'. This field will be pulled from the
+        // Ruby side once the callback is initiated.
+        setGuiElementProperty('headsUpDisplay', 'innerHTML', '');
+        setGuiElementProperty('runList', 'value', selected_test_list.join(','));
+        callRuby('run');
+      }
+    }
+    
+    function setGuiElementProperty(id, prop, v){
+      document.getElementById(id)[prop] = v;
+  }
+    </script>
+  </head>
+  <body onload="bodyLoad()">
+    <a href="javascript:;" id="btnRunTests" onclick="run();return false;">&nbsp;</a>
+    <input id="runList" type="hidden" />
+    <span id="headsUpDisplay"></span>
+    <div id="divGui"></div>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+body{
+  font-family: "Arial, sans-serif";
+  font-size: 10pt;
+  background-color: #eee;
+}
+#divDisplay{
+  font-family: "Courier New";
+  font-size: 10pt;
+  margin-left: 20px;
+  display: inline;
+}
+#divGui div{
+  margin: 0;
+  padding: 1em;
+}
+.statusWarn{
+  color: red;
+  font-weight: bold;
+}
+.nav ul{
+  list-style-type: none;
+  margin: 0;
+}
+.nav ul li{
+  margin-right: 5px;
+  float: left;
+  width: 8em;
+  margin-bottom: -1px;
+}
+.nav ul li a{
+  padding: 4px 0px 4px 6px;
+  border: 1px solid black;
+  display: block;
+  color: #000;
+  text-decoration: none;
+  background: #ccc;
+}
+.nav ul li a.on{
+  background: #eee;
+  border-bottom: 1px solid #eee;
+}
+.nav ul li a:hover{
+  background: #eee;
+}
+.view{
+  clear: both;
+  border-top: 1px solid black;
+}
+.view a{
+  text-decoration: none;
+  color: black;
+}
+.view.result{
+  font-family: "Courier New";
+  font-size: 10pt;
+}
+.view.failMsg{
+  background-color: #bff;
+}
+.view.failMsg a{
+  text-decoration: underline;
+}
+.view.fail{
+  background-color: red;
+}
+.view.pass{
+  background-color: lightgreen;
+}
+.view.warn{
+  background-color: yellow;
+}
+.view.wtf{
+  background-color: magenta;
+}
+#divTarget{
+  font-size: 9pt;
+  margin-bottom: 15px;
+}
+#divTarget select{
+  font-family: 'Courier New';
+}
+#divTarget a{
+  font-size: 80%;
+  margin-left: 10px;
+  color: red
+}
+#btnRunTests{
+  font-family: Verdana;
+  font-size: 14pt;
+  font-weight: bold;
+}
+#divResultControls a{
+  margin-right: 10px;
+}
