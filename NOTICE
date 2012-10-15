@@ -2,6 +2,8 @@ SketchUp Developer Tools Extension
 Copyright 2012 Trimble Navigation Ltd. (http://www.trimble.com)
 
 Developed by the SketchUp team at Trimble. (http://www.sketchup.com/)
+Particular credit to Scott Shattuck, who first developed the console, and
+Matt Lowrie, who first developed TestUp.
 
 A few ruby libraries were built by others:
 
