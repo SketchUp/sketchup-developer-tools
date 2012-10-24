@@ -448,7 +448,7 @@ class Console
       # Note we do the eval here in the context of a reused proc. This
       # approach means that each call can build upon prior results and
       # variables which might have been created.
-      result = eval( buffer, TOPLEVEL_BINDING )
+      result = eval(buffer, TOPLEVEL_BINDING)
       fault = false
 
       # Now it turns out that inspect likes to, misbehave in some sense, in
