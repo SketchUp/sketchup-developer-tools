@@ -24,16 +24,19 @@ Copyright 2012 Trimble Navigation Ltd.
 <body onload="console.initialize()" border="none">
 <div id="background">
   <div id="header" unselectable="on">
-    <div id="clear" title=" Clear the console" class="button-container"><a class="button">clear</a></div>
-    <div id="reload" title=" Reload plugins folder" class="button-container"><a class="button">reload</a></div>
+    <div id="clear" title=" Clear the console" class="button-container"><a class="button">Clear</a></div>
+    <div id="reload" title=" Reload plugins folder" class="button-container"><a class="button">Reload</a></div>
     <div id="logged" title=" Write to logfile">
-      <input type="checkbox" id="logged_check"/>
-      logged
-      
+      <label>
+        <input type="checkbox" id="logged_check"/>
+        Logged
+      </label>
     </div>
     <div id="quiet" title=" Suspend 'puts' data">
-      <input type="checkbox" id="quiet_check"/>
-      quiet
+      <label>
+        <input type="checkbox" id="quiet_check"/>
+        Quiet
+      </label>
     </div>
     <!--div id="plain" title="plain output only">
       <input type="checkbox" id="plain_check"/>
@@ -51,7 +54,7 @@ Copyright 2012 Trimble Navigation Ltd.
     <div id="input">
       <textarea id="command" rows="1" title=" Shift+return to add lines"></textarea>
     </div>
-    <div id="go" title=" Execute the command" class="button-container"><a class="button">go</a></div>
+    <div id="go" title=" Execute the command" class="button-container"><a class="button">Go</a></div>
   </div>
 </div>
 </body>
