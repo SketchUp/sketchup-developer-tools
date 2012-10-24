@@ -219,8 +219,15 @@ class Console
   #
   # Args:
   # - data:  Object, the object to output via the console or puts!.
+  # - mthd:  Symbol, method to forward the data to. May be :puts! or :print!
   #
-  def self.output(data, method=:puts!)
+  def self.output(data, mthd=:puts!)
+    # If the developer console isn't active, fall-back to standard ruby output
+    if @@rootConsole.nil? || !@@rootConsole.visible?
+      # Note the ! here, which is how we alias the original puts function.
+      send(mthd, data)
+      return
+    end
 
     # Cleanse relative to newlines and quoting so we can ask the JS side to
     # execute it effectively.
@@ -229,17 +236,11 @@ class Console
     str = str.gsub(/([^\\])'/, "\1\\'")
     # Abuse the fact that console.appendContent will plain write anything
     # that "looks like markup"
-    str = '<span class="output">' + str + '</span>' if method == :print!
+    str = '<span class="output">' + str + '</span>' if mthd == :print!
 
-    if @@rootConsole.nil? || !@@rootConsole.visible?
-      # Note the ! here, which is how we alias the original puts function.
-      send(method, data)
-      return
-    else
-      @@rootConsole.execute_script(
-        "try { console.appendContent('" + str + "')" + 
-        "} catch (e) { console.appendContent(e.message); }")
-    end
+    @@rootConsole.execute_script(
+      "try { console.appendContent('" + str + "')" + 
+      "} catch (e) { console.appendContent(e.message); }")
   end
 
   # Sets the default "quiet" flag for all consoles. Individual consoles can
@@ -738,8 +739,9 @@ module Kernel
     #
     # Args:
     # - args: Object, the object (usually a string) to output.
+    # - mthd:  Symbol, method to forward the data to. May be :puts! or :print!
     # 
-    def puts_or_print(args, method)
+    def puts_or_print(args, mthd)
       # Regardless of whether we're in quiet mode or not we respect the
       # logging setting if set.
       if Developer::Console.logging?
@@ -760,15 +762,27 @@ module Kernel
         return
       else
         # Route to the console via our output method.
-        Developer::Console.output(args, method)
+        Developer::Console.output(args, mthd)
       end
     end
 
+    # Replaces the original puts method to allow for re-routing the output
+    # to appropriate locations.
+    #
+    #
+    # Args:
+    # - args: Object, the object (usually a string) to output.
     def puts(args)
       puts_or_print(args, :puts!)
       return
     end
 
+    # Replaces the original print method to allow for re-routing the output
+    # to appropriate locations.
+    #
+    #
+    # Args:
+    # - args: Object, the object (usually a string) to output.
     def print(args)
       puts_or_print(args, :print!)
       return
