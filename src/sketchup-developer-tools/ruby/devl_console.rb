@@ -220,17 +220,20 @@ class Console
   # Args:
   # - data:  Object, the object to output via the console or puts!.
   #
-  def self.output(data)
+  def self.output(data, method=:puts!)
 
     # Cleanse relative to newlines and quoting so we can ask the JS side to
     # execute it effectively.
     str = Bridge.clean_for_xml(str)
     str = data.to_s.gsub(/\n/, '<br/>')
     str = str.gsub(/([^\\])'/, "\1\\'")
+    # Abuse the fact that console.appendContent will plain write anything
+    # that "looks like markup"
+    str = '<span class="output">' + str + '</span>' if method == :print!
 
     if @@rootConsole.nil? || !@@rootConsole.visible?
       # Note the ! here, which is how we alias the original puts function.
-      puts!(data)
+      send(method, data)
       return
     else
       @@rootConsole.execute_script(
@@ -725,6 +728,7 @@ module Kernel
     # Capture the original version in an alias we can call in case of an
     # error in the console itself. Very useful for debugging.
     alias puts! puts
+    alias print! print
 
     # Outputs data to the Developer Console, optionally discarding it when
     # in quiet mode, logging it to a file when logging is true, or routing
@@ -735,8 +739,7 @@ module Kernel
     # Args:
     # - args: Object, the object (usually a string) to output.
     # 
-    def puts(args)
-
+    def puts_or_print(args, method)
       # Regardless of whether we're in quiet mode or not we respect the
       # logging setting if set.
       if Developer::Console.logging?
@@ -757,11 +760,20 @@ module Kernel
         return
       else
         # Route to the console via our output method.
-        Developer::Console.output(args)
+        Developer::Console.output(args, method)
       end
+    end
+
+    def puts(args)
+      puts_or_print(args, :puts!)
+      return
+    end
+
+    def print(args)
+      puts_or_print(args, :print!)
+      return
     end
 
   end
 
 end   # End of Kernel module
-
