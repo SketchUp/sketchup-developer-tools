@@ -462,7 +462,10 @@ class Console
       end
 
     rescue Exception => e
-      result = Bridge.clean_for_xml(e.class.to_s + ': ' + e.message.to_s)
+      # The last four lines refer to the Developer Console executing - we'll
+      # strip this out.
+      trace = e.backtrace[0...-4].join("\n")
+      result = Bridge.clean_for_xml("#{e.class}: #{e.message}\n#{trace}")
       fault = true
     end
   
