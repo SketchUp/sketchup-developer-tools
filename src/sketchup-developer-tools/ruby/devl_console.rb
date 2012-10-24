@@ -462,9 +462,10 @@ class Console
       end
 
     rescue Exception => e
-      # The last four lines refer to the Developer Console executing - we'll
-      # strip this out.
-      trace = e.backtrace[0...-4].join("\n")
+      # When eval is called with TOPLEVEL_BINDING it's the first item in the
+      # traceback that refer to the developer console. We omit this as it's
+      # misleading.
+      trace = e.backtrace[1..-1].join("\n")
       result = Bridge.clean_for_xml("#{e.class}: #{e.message}\n#{trace}")
       fault = true
     end
