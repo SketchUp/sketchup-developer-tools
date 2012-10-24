@@ -230,12 +230,9 @@ class Console
 
     if @@rootConsole.nil? || !@@rootConsole.visible?
       # Note the ! here, which is how we alias the original puts function.
-      puts!(str || data.to_s)
+      puts!(data)
       return
-    else 
-
-      
-
+    else
       @@rootConsole.execute_script(
         "try { console.appendContent('" + str + "')" + 
         "} catch (e) { console.appendContent(e.message); }")
