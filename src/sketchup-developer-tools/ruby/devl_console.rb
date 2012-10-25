@@ -450,7 +450,7 @@ class Console
       # Note we do the eval here in the context of a reused proc. This
       # approach means that each call can build upon prior results and
       # variables which might have been created.
-      result = eval buffer, @binding
+      result = eval(buffer, TOPLEVEL_BINDING)
       fault = false
 
       # Now it turns out that inspect likes to, misbehave in some sense, in
@@ -464,7 +464,11 @@ class Console
       end
 
     rescue Exception => e
-      result = Bridge.clean_for_xml(e.class.to_s + ': ' + e.message.to_s)
+      # When eval is called with TOPLEVEL_BINDING it's the first item in the
+      # traceback that refer to the developer console. We omit this as it's
+      # misleading.
+      trace = e.backtrace[1..-1].join("\n")
+      result = Bridge.clean_for_xml("#{e.class}: #{e.message}\n#{trace}")
       fault = true
     end
   
