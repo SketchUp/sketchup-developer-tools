@@ -6,6 +6,7 @@ Copyright 2012 Trimble Navigation Ltd.
 <head>
 <title>SketchUp Developer Console</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="MSThemeCompatible" content="Yes">
 
 <!-- build for standards-compliance, override for good old IE -->
 <link href="../css/developer.css" rel="stylesheet" type="text/css"/>
@@ -27,13 +28,16 @@ Copyright 2012 Trimble Navigation Ltd.
     <div id="clear" title=" Clear the console" class="button-container"><a class="button">clear</a></div>
     <div id="reload" title=" Reload plugins folder" class="button-container"><a class="button">reload</a></div>
     <div id="logged" title=" Write to logfile">
-      <input type="checkbox" id="logged_check"/>
-      logged
-      
+      <label>
+        <input type="checkbox" id="logged_check"/>
+        logged
+      </label>
     </div>
     <div id="quiet" title=" Suspend 'puts' data">
-      <input type="checkbox" id="quiet_check"/>
-      quiet
+      <label>
+        <input type="checkbox" id="quiet_check"/>
+        quiet
+      </label>
     </div>
     <!--div id="plain" title="plain output only">
       <input type="checkbox" id="plain_check"/>
