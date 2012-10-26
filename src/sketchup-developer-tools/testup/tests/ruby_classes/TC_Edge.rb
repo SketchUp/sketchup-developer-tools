@@ -133,7 +133,7 @@ class TC_Edge < Test::Unit::TestCase
        UI.messagebox "Smooth"
        status = entity.smooth="false"
      else
-       # if false, set it to true
+       # If false, set it to true
        UI.messagebox "Not Smooth"
        status = entity.smooth="true"
      end
@@ -184,7 +184,7 @@ class TC_Edge < Test::Unit::TestCase
      # Add the face to the entities in the model
      face = entities.add_face pts
      # I just happen to know that the second entity in the
-     # entities objects is an edge.
+     # entities objects is an edge
      entity1 = entities[1]
      curve = entity1.explode_curve
      if (curve)
@@ -242,9 +242,9 @@ class TC_Edge < Test::Unit::TestCase
      # Add the face to the entities in the model
      face = entities.add_face pts
      # I just happen to know that the second entity in the
-     # entities objects is an edge.
+     # entities objects is an edge
      entity1 = entities[1]
-     # Getting zero.
+     # Getting zero
      number = entity1.find_faces
      if (number)
        UI.messagebox "I created " + number.to_s + " faces."
@@ -329,14 +329,14 @@ class TC_Edge < Test::Unit::TestCase
   def test_set_soft_api_example
     assert_nothing_raised do
      entity = Sketchup.active_model.entities.add_line([0,0,0],[100,100,0])
-     # Examine the current soft setting on an edge.
+     # Examine the current soft setting on an edge
      status = entity.soft?
      if (status)
        # If true, set it to false
        UI.messagebox "Soft"
        status = entity.soft="false"
      else
-       # if false, set it to true
+       # If false, set it to true
        UI.messagebox "Not Soft"
        status = entity.soft="true"
      end
@@ -432,13 +432,13 @@ class TC_Edge < Test::Unit::TestCase
      edge = Sketchup.active_model.entities.add_line([0,0,0],[100,100,0])
      vertex = edge.end
      if (vertex)
-       # display a pointer to the Vertex
+       # Display a pointer to the Vertex
        UI.messagebox vertex
      else
        UI.messagebox "Failure"
      end
      point = vertex.position
-     # Let's get the Point3d of the vertex
+     # Let's get the Point3d of the Vertex
      if (point)
        UI.messagebox point
      else
@@ -481,14 +481,14 @@ class TC_Edge < Test::Unit::TestCase
   def test_soft_api_example
     assert_nothing_raised do
      entity = Sketchup.active_model.entities.add_line([0,0,0],[100,100,0])
-     # Examine the current soft setting on an edge.
+     # Examine the current soft setting on an edge
      status = entity.soft?
      if (status)
        # If true, set it to false
        UI.messagebox "Soft"
        status = entity.soft="false"
      else
-       # if false, set it to true
+       # If false, set it to true
        UI.messagebox "Not Soft"
        status = entity.soft="true"
      end
@@ -530,9 +530,9 @@ class TC_Edge < Test::Unit::TestCase
   def test_used_by_api_example
     assert_nothing_raised do
      edge = Sketchup.active_model.entities.add_line([0,0,0],[100,100,0])
-     # Returns a vertex
+     # Returns a Vertex
      vertex = edge.start
-     # Check to see if the edge is used by the Vertex.
+     # Check to see if the edge is used by the Vertex
      status = edge.used_by? vertex
      if (status)
        UI.messagebox status
@@ -622,13 +622,13 @@ class TC_Edge < Test::Unit::TestCase
      edge = Sketchup.active_model.entities.add_line([0,0,0],[100,100,0])
      vertex = edge.start
      if (vertex)
-       # display a pointer to the Vertex
+       # Display a pointer to the Vertex
        UI.messagebox vertex
      else
        UI.messagebox "Failure"
      end
      point = vertex.position
-     # Let's get the Point3d of the vertex
+     # Let's get the Point3d of the Vertex
      if (point)
        UI.messagebox point
      else
@@ -656,8 +656,8 @@ class TC_Edge < Test::Unit::TestCase
   # @par Ruby Method:    Edge.other_vertex
   # @file                redge.cpp
   #
-  # The other_vertex method is used to find the opposite vertex given one
-  # vertex of the edge.
+  # The other_vertex method is used to find the opposite Vertex given one
+  # Vertex of the edge.
   #
   #
   # Args:
@@ -672,16 +672,16 @@ class TC_Edge < Test::Unit::TestCase
   def test_other_vertex_api_example
     assert_nothing_raised do
      edge = Sketchup.active_model.entities.add_line([0,0,0],[100,100,0])
-     # Get the end vertex of an edge
+     # Get the end Vertex of an edge
      vertex = edge.end
-     # Should find the starting vertex
+     # Should find the starting Vertex
      othervertex = edge.other_vertex vertex
      if (othervertex)
        UI.messagebox othervertex
      else
        UI.messagebox "Failure"
      end
-     # The Point3d for the vertex
+     # The Point3d for the Vertex
      point = othervertex.position
      if (point)
        UI.messagebox point
@@ -725,14 +725,14 @@ class TC_Edge < Test::Unit::TestCase
   def test_set_smooth_api_example
     assert_nothing_raised do
      entity = Sketchup.active_model.entities.add_line([0,0,0],[100,100,0])
-     # Examine the current smooth setting on an edge.
+     # Examine the current smooth setting on an edge
      status = entity.smooth?
      if (status)
        # If true, set it to false
        UI.messagebox "Smooth"
        status = entity.smooth="false"
      else
-       # if false, set it to true
+       # If false, set it to true
        UI.messagebox "Not Smooth"
        status = entity.smooth="true"
      end
@@ -783,7 +783,7 @@ class TC_Edge < Test::Unit::TestCase
      # Add the face to the entities in the model
      face = entities.add_face pts
      # I just happen to know that the second and third entities in the
-     # entities objects are edges.
+     # entities objects are edges
      entity1 = entities[1]
      entity2 = entities[2]
      edges = entity1.all_connected
@@ -832,7 +832,7 @@ class TC_Edge < Test::Unit::TestCase
      edge = Sketchup.active_model.entities.add_line([0,0,0],[100,100,0])
      curve = edge.curve
      if (curve)
-       # if it is a curve, display a pointer to the curve
+       # If it is a curve, display a pointer to the curve
        UI.messagebox curve
      else
        UI.messagebox "Failure: Not a Curve"
@@ -883,7 +883,7 @@ class TC_Edge < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_split_api_example
     assert_nothing_raised do
-     # Split a line in half.
+     # Split a line in half
      edge = Sketchup.active_model.entities.add_line([0,0,0],[100,100,0])
      new_edge = edge.split 0.5
     end
