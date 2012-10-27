@@ -22,7 +22,7 @@ If you're a SketchUp Ruby community member, use git to grab the code, make some 
 
 If you're an owner of this repo, here are some steps.
 
-Get a local copy of the files. This will create a sketchup-stl folder.
+Get a local copy of the files. This will create a sketchup-developer-tools folder.
 
 	git clone https://github.com/SketchUp/sketchup-developer-tools.git  
 	cd sketchup-developer-tools 
