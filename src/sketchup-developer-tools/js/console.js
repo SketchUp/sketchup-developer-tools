@@ -238,13 +238,16 @@ console.exec_h = console.exec_help;
  * @param {string} script The string to evaluate.
  */
 console.exec_js = function(script) {
+  var type = "javascript"
   try {
     result = window.eval(script);
+    type += " result"
   } catch (e) {
     result = e.message;
+    type += " error"
   }
 
-  console.appendContent(result);
+  console.appendContent(result, {'type': type});
 };
 
 /**
@@ -339,9 +342,8 @@ console.execCommandCell = function() {
     return;
   }
 
-  // Echo the command back out with a class for styling hooks.
-  console.appendContent('<div class="input">&#187; ' + su.escapeHTML(cmd) +
-      '</div>');
+  // Send the command to appendContent and let it handle all markup.
+  console.appendContent(cmd, {'type': 'ruby input'});
 
   // Ask for the Ruby to be eval'd and the result logged/quiet as needed.
   su.callRuby('do_exec', {
@@ -438,27 +440,80 @@ console.updateCommandCell = function(aValue) {
 //  --------------------------------------------------------------------------
 
 /**
- * Appends content to the console. When the output appears to be markup it
- * is left untouched before appending. When the output does not appear to be
- * markup it is first wrapped in a DIV element with a CSS class of 'output'.
+ * Appends content to the console and adds markup depending on message type.
  * @param {string} output The new output content to append.
  */
-console.appendContent = function(output) {
+console.appendContent = function(output, metadata) {
   var content = $('content');
   var str = su.trimWhitespace(content.innerHTML);
-
-  // If we're outputing what appears to be markup just write it out.
-  if (su.isMarkup(output)) {
-    str = str + output;
-  } else {
-    str = str + '<div class="output">' + output + '</div>';
+  var type = metadata['type'] || 'other';
+  
+  // We do all xml markup only here:
+  // Prepare all <,> for xml, except if the code highlighter does it for us.
+  if ( !/ruby/.test(type) ) {
+    output = output.replace(/\</g, '&lt;').replace(/\>/g, '&gt;')
+  };
+  
+  // Handle different message types.
+  // Errors
+  if ( /error/.test(type) ) {
+    var backtrace = metadata['backtrace'];
+    backtrace = backtrace.join('<br>');
+    // Shorten long file paths to make it easier to read.
+    backtrace = backtrace.replace(/((?:[A-Z]\:|\/)[^\:]+)/g, function(filepath){
+	    // Truncate the Plugins folder, or as fallback keep only the filename.
+      var relpath = /\/[Pp]lugins\//.test(filepath)? filepath.replace(/^.*\/[Pp]lugins\//,"") : filepath.match(/[^\/]+$/);
+      if(relpath == filepath){ return filepath };
+      var truncated = '<a onclick="this.innerHTML=(this.innerHTML!=\'…\')? \'…\' : \'' + filepath.replace("/"+relpath,"") + '\'">…</a>/';
+      return '<span class="filepath" title="' + filepath + '">' + truncated + relpath + '</span>';
+    });
+    
+    str += '<div class="' + type + ' ui-collapsible-panel collapsed">' +
+      '<div class="ui-collapsible-header" ' +
+      'onclick="console.toggleClass(this.parentNode, \'collapsed\')" >' +
+      output + '</div>' +
+      '<div class="ui-collapsible-content">' + backtrace + '</div>' +
+      '</div>';
+  }
+  // Print
+  else if ( /print/.test(type) ) {
+    if ( /ruby/.test(type) && su.isDefined(hljs) ) {
+      output = '<pre><code>' + hljs.highlight('ruby', output).value + '</code></pre>'
+    };
+    str += '<span class="print">' + output + '</span>';
+  }
+  // Puts and anything else that gets a new line.
+  else {
+	  // Highlight Ruby code.
+    if ( /ruby/.test(type) && su.isDefined(hljs) ) {
+      output = '<pre><code>' + hljs.highlight('ruby', output).value + '</code></pre>';
+    };
+    str += '<div class="' + type + '">' + output + '</div>';
   }
 
+  // Append to the console content.
   content.innerHTML = str;
   setTimeout(function() {
     su.scrollToEnd(content);
     }, 0);
 };
+
+
+// TODO: Place this function somewhere where it fits well.
+/**
+ * Toggles a class on an HTMLElement.
+ */
+console.toggleClass = function(element, className, value) {
+  var r = new RegExp("(^\\s*|\\s*\\b)" + className + "(\\b|$)");
+  if (value==null) { var value = !r.test(element.className) };
+  if (value) {
+    element.className += (element.className ? ' ' : '') + className;
+  }
+  else {
+    element.className = element.className.replace(r, "");
+  };
+};
+
 
 /**
  * Clears the console's content area.
@@ -501,17 +556,11 @@ console.increaseContentFont = function() {
  * Sets the content of the console (clearing it of any prior content).
  * @param {string} The content to set in the console.
  */
-console.setContent = function(output) {
-  var str;
-  var content = $('content');
-  // If we're outputing what appears to be markup just write it out.
-  if (su.isMarkup(output)) {
-    str = output;
-  } else {
-    str = '<div class="output">' + output + '</div>';
-  }
-
-  content.innerHTML = str;
+console.setContent = function(output, metadata) {
+  // Clear the content.
+  var content = $('content').innerHTML = "";
+  // Send the new content to appendContent.
+  console.appendContent(output, metadata)
 };
 
 //  --------------------------------------------------------------------------

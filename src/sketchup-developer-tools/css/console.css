@@ -412,16 +412,37 @@ html, body {
   visibility: visible;
 }
 
+#content div {
+  padding-left: 10px;
+}
+#content div.input {
+  background: url("./icon_input.png") no-repeat scroll 0 0 transparent;
+}
+#content div.result {
+  background: url("./icon_result.png") no-repeat scroll 0 0 transparent;
+}
+#content div.error {
+  background: url("./icon_error.png") no-repeat scroll 0 0 transparent;
+}
+#content div.puts {
+  background: url("./icon_puts.png") no-repeat scroll 0 0 transparent;
+}
+
+/* This overwrites some styles that might be set in the highlight theme. */
+#content pre code {
+  padding: 0;
+  background-color: transparent;
+  white-space: pre-wrap;
+}
+
 /* command input is wrapped in this style */
-div.input {
-  margin: 6px;
+#content div.input {
   color: #999;
   font-weight: bold;
 }
 
-/* command output is wrapped in this style */
-div.output {
-  margin: 6px;
+/* command result is wrapped in this style */
+#content div.result {
 }
 
 .button {
@@ -480,3 +501,21 @@ div.output {
   cursor: pointer;
 }
 
+
+.ui-collapsible-panel {
+}
+
+.ui-collapsible-header {
+  cursor: pointer
+}
+
+.ui-collapsible-content {
+}
+
+.ui-collapsible-panel.collapsed .ui-collapsible-content {
+  display: none;
+}
+
+.ui-collapsible-panel.collapsed .ui-collapsible-header {
+  cursor: pointer
+ }
