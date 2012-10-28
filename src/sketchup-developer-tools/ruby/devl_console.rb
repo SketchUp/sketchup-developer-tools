@@ -501,6 +501,7 @@ class Console
 
     buffer = params['command']
 
+    # Output the buffer/command string to the log.
     puts!('> ' + buffer)
     Developer::Console.log('> ' + buffer)
 
@@ -508,30 +509,23 @@ class Console
       # Note we do the eval here in the context of a reused proc. This
       # approach means that each call can build upon prior results and
       # variables which might have been created.
-      result = eval buffer, @binding
+      result = eval(buffer, TOPLEVEL_BINDING)
       fault = false
-
-      # Now it turns out that inspect likes to misbehave in some sense, in
-      # that a string that started out as str='blah"s' will end up as
-      # str="blah"s" which is ok from a Ruby sense but not a JavaScript one.
-      # Here we massage that case a little to mirror what a Ruby user expects.
-      #if result.kind_of? String
-      #  result = '"' + result.gsub(/([^\\])"/, '\1\\"') + '"'
-      #else
-      #  result = result.nil? ? 'nil' : Bridge.clean_for_xml(result.inspect)
-      #end
 
       result = result.inspect
       Developer::Console.outputContent(result, {"type"=>"ruby result"})
 
     rescue Exception => e
-      #result = Bridge.clean_for_xml(e.class.to_s + ': ' + e.message.to_s)
       result = e.class.to_s + ': ' + e.message.to_s
-      Developer::Console.outputContent(result, {"backtrace"=>e.backtrace, "type"=>"error"})
+      # When eval is called with TOPLEVEL_BINDING it's the first item in the
+      # traceback that refer to the developer console. We omit this as it's
+      # misleading.
+      backtrace = e.backtrace[1..-1]
+      # Send the error to the output:
+      Developer::Console.outputContent(result, {"backtrace"=>backtrace, "type"=>"error"})
       fault = true
     end
 
-    result = Bridge.clean_for_xml(result)
     Bridge.js_callback(dialog, 'do_exec', query, result, fault) # TODO: What does this?
   end
 
@@ -790,9 +784,9 @@ module Kernel
     #
     #
     # Args:
-    # - args: Object, the object (usually a string) to output.
     # - output_method:  Symbol, method to forward the data to. May be :puts! or
     #    :print!
+    # - args: Object, the object (usually a string) to output.
     #
     # TODO: do we need this method really?
     def puts_or_print(output_method, *args)

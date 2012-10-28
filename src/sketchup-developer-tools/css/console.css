@@ -467,7 +467,7 @@ html, body {
 }
 
 .button:hover {
-  background: #f8f5ed; /* Old browsers */
+  background: #fbf8ef; /* Old browsers */
   background: -moz-linear-gradient(top,  #fbf8ef 0%, #dcd8d0 100%); /* FF3.6+ */
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fbf8ef), color-stop(100%,#dcd8d0)); /* Chrome,Safari4+ */
   background: -webkit-linear-gradient(top,  #fbf8ef 0%,#dcd8d0 100%); /* Chrome10+,Safari5.1+ */
@@ -478,7 +478,7 @@ html, body {
 }
 
 .button:active {
-  background: #f8f5ed; /* Old browsers */
+  background: #d3cfc8; /* Old browsers */
   background: -moz-linear-gradient(top,  #d3cfc8 0%, #e7e4dc 100%); /* FF3.6+ */
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#d3cfc8), color-stop(100%,#e7e4dc)); /* Chrome,Safari4+ */
   background: -webkit-linear-gradient(top,  #d3cfc8 0%,#e7e4dc 100%); /* Chrome10+,Safari5.1+ */
