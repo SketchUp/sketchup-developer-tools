@@ -446,6 +446,7 @@ console.updateCommandCell = function(aValue) {
 console.appendContent = function(output, metadata) {
   var content = $('content');
   var str = su.trimWhitespace(content.innerHTML);
+  metadata = metadata || {};
   var type = metadata['type'] || 'other';
   
   // We do all xml markup only here:
@@ -453,11 +454,11 @@ console.appendContent = function(output, metadata) {
   if ( !/ruby/.test(type) ) {
     output = output.replace(/\</g, '&lt;').replace(/\>/g, '&gt;')
   };
-  
+
   // Handle different message types.
   // Errors
   if ( /error/.test(type) ) {
-    var backtrace = metadata['backtrace'] || "";
+    var backtrace = metadata['backtrace'] || [];
     backtrace = backtrace.join('<br>');
     // Shorten long file paths to make it easier to read.
     backtrace = backtrace.replace(/((?:[A-Z]\:|\/)[^\:]+)/g, function(filepath){
@@ -467,7 +468,7 @@ console.appendContent = function(output, metadata) {
       var truncated = '<a onclick="this.innerHTML=(this.innerHTML!=\'…\')? \'…\' : \'' + filepath.replace("/"+relpath,"") + '\'">…</a>/';
       return '<span class="filepath" title="' + filepath + '">' + truncated + relpath + '</span>';
     });
-    
+
     str += '<div class="message ' + type + ' ui-collapsible-panel collapsed">' +
       '<div class="ui-collapsible-header" ' +
       'onclick="console.toggleClass(this.parentNode, \'collapsed\')" >' +

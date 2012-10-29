@@ -235,11 +235,69 @@ class Console
   end
 
 
-    @@rootConsole.execute_script(
-      "try { console.appendContent('" + str + "')" + 
-      "} catch (e) { console.appendContent(e.message); }")
+  # BEGIN PASTED
+  # TODO: put these two methods somewhere where they fit well (Bridge?)
+  # Make them private + instance methods (?)
+  
+  # Convert a json object into a Ruby hash.
+  #
+  # Args:
+  # - json_string: String of a json object.
+  #
+  # Returns:
+  # - Hash (or Array)
+  def self.from_json(json_string)
+    # Split at every even number of unescaped quotes; if it's not a string then replace : and null
+    # DEBUG: test objects with empty strings "", test arrays, test pure strings, test strings with : or => or " or \
+    ruby_string = json_string.split(/(\"(?:.*?[^\\])*?\")/).collect{|s| (s[0..0] != '"')? s.gsub(/\:/, "=>").gsub(/null/, "nil") : s }.join()
+    result = eval(ruby_string)
+    return result
+    rescue Exception => e
+      {}
   end
 
+  # Convert a Ruby hash into a json string.
+  #
+  # Args:
+  # - obj: Ruby object containing any of String, Symbol, Fixnum, Float, Array, Hash, TrueClass, FalseClass, NilClass.
+  #
+  # Returns:
+  # - String of a json object, containing any of String, Fixnum, Float, Array, Object, true, false, null.
+  def self.to_json(obj)
+    # remove non-JSON objects
+    return "null" unless [String, Symbol, Fixnum, Float, Array, Hash, TrueClass, FalseClass, NilClass].inject(false){|b,c| b = (obj.is_a?(c))? true : b}
+    if obj.is_a? Array
+      obj.reject!{|k| ![String, Symbol, Fixnum, Float, Array, Hash, TrueClass, FalseClass, NilClass].inject(false){|b,c| b = (k.is_a?(c))? true : b} }
+    elsif obj.is_a? Hash
+      obj.reject!{|k,v|
+        !k.is_a?(String) && !k.is_a?(Symbol) ||
+        ![String, Symbol, Fixnum, Float, Array, Hash, TrueClass, FalseClass, NilClass].inject(false){|b,c| b = (v.is_a?(c))? true : b}
+      }
+    end
+    # split at every even number of unescaped quotes; if it's not a string then turn Symbols into String and replace => and nil
+    json_string = obj.inspect.split(/(\"(?:.*?[^\\])*?\")/).collect{|s| (s[0..0] != '"')? s.gsub(/\:(\S+?(?=\=>|\s))/, "\"\\1\"").gsub(/=>/, ":").gsub(/\bnil\b/, "null") : s }.join()
+    return json_string
+  end
+  # END
+  
+  # Log a message to a log file.
+  #
+  # Args:
+  # - str: String, the message to log to a file.
+  #
+  def self.log(str)
+    path = Developer::Console.log_file
+    timestamp = Developer::Console.timestamp? ? Time.now.to_s + ' ' : ''
+    begin
+      # Open is an 'append'. Clearing the log is a separate operation.
+      open(path, 'a') do |f|
+        f << timestamp + str.to_s + "\n"
+      end
+    rescue Exception => e
+      puts! "#{e.class}: #{e.message}"
+    end
+  end
+  
   # Sets the default "quiet" flag for all consoles. Individual consoles can
   # override this setting based on their configuration at execution time.
   # The quiet flag determines whether Kernel::puts output is discarded.
@@ -468,6 +526,7 @@ class Console
       fault = true
     end
 
+    result = Bridge.clean_for_xml(result)
     Bridge.js_callback(dialog, 'do_exec', query, result, fault) # TODO: What does this?
   end
 
