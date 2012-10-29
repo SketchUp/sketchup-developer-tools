@@ -449,7 +449,7 @@ console.appendContent = function(output, metadata) {
   var type = metadata['type'] || 'other';
   
   // We do all xml markup only here:
-  // Prepare all <,> for xml, except if the code highlighter does it for us.
+  // Prepare all <,> for xml, except if the syntax highlighter does it for us.
   if ( !/ruby/.test(type) ) {
     output = output.replace(/\</g, '&lt;').replace(/\>/g, '&gt;')
   };
@@ -457,7 +457,7 @@ console.appendContent = function(output, metadata) {
   // Handle different message types.
   // Errors
   if ( /error/.test(type) ) {
-    var backtrace = metadata['backtrace'];
+    var backtrace = metadata['backtrace'] || "";
     backtrace = backtrace.join('<br>');
     // Shorten long file paths to make it easier to read.
     backtrace = backtrace.replace(/((?:[A-Z]\:|\/)[^\:]+)/g, function(filepath){
@@ -468,7 +468,7 @@ console.appendContent = function(output, metadata) {
       return '<span class="filepath" title="' + filepath + '">' + truncated + relpath + '</span>';
     });
     
-    str += '<div class="' + type + ' ui-collapsible-panel collapsed">' +
+    str += '<div class="message ' + type + ' ui-collapsible-panel collapsed">' +
       '<div class="ui-collapsible-header" ' +
       'onclick="console.toggleClass(this.parentNode, \'collapsed\')" >' +
       output + '</div>' +
@@ -476,19 +476,21 @@ console.appendContent = function(output, metadata) {
       '</div>';
   }
   // Print
-  else if ( /print/.test(type) ) {
+  else if ( /print|puts/.test(type) ) {
     if ( /ruby/.test(type) && su.isDefined(hljs) ) {
       output = '<pre><code>' + hljs.highlight('ruby', output).value + '</code></pre>'
     };
-    str += '<span class="print">' + output + '</span>';
+    str += '<span class="message ' + type + '">' + output + '</span>';
+    // Except of print, everything else creates a new line after it.
+    if ( !/print/.test(type) ) {str += '<br/>' };
   }
-  // Puts and anything else that gets a new line.
+  // Anything else.
   else {
 	  // Highlight Ruby code.
     if ( /ruby/.test(type) && su.isDefined(hljs) ) {
       output = '<pre><code>' + hljs.highlight('ruby', output).value + '</code></pre>';
     };
-    str += '<div class="' + type + '">' + output + '</div>';
+    str += '<div class="message ' + type + '">' + output + '</div>';
   }
 
   // Append to the console content.

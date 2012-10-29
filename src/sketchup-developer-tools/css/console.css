@@ -412,8 +412,14 @@ html, body {
   visibility: visible;
 }
 
-#content div {
-  padding-left: 10px;
+/* Indent each new line so that the icon can show. */
+/* #content > *:first-child, #content > :not(span) + * */
+#content > *:first-child, #content div.message, #content div.message + *, #content br + *.message {
+  padding-left: 15px;
+  border-top: 1px #ccc solid;
+}
+#content div.input + div.result, #content div.input + div.error {
+  border-top: 0;
 }
 #content div.input {
   background: url("./icon_input.png") no-repeat scroll 0 0 transparent;
@@ -424,25 +430,20 @@ html, body {
 #content div.error {
   background: url("./icon_error.png") no-repeat scroll 0 0 transparent;
 }
-#content div.puts {
+/* #content > .puts:first-child, #content > :not(span) + .puts */
+#content .puts:first-child, #content div + .puts, #content br + .puts {
+  background: url("./icon_puts.png") no-repeat scroll 0 0 transparent;
+}
+/* #content > .print:first-child, #content > :not(span) + .print */
+#content .print:first-child, #content div + .print, #content br + .print {
   background: url("./icon_puts.png") no-repeat scroll 0 0 transparent;
 }
 
-/* This overwrites some styles that might be set in the highlight theme. */
+/* This overwrites some styles that might be set in the syntax highlighter theme. */
 #content pre code {
   padding: 0;
   background-color: transparent;
   white-space: pre-wrap;
-}
-
-/* command input is wrapped in this style */
-#content div.input {
-  color: #999;
-  font-weight: bold;
-}
-
-/* command result is wrapped in this style */
-#content div.result {
 }
 
 .button {

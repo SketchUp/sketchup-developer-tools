@@ -800,16 +800,19 @@ module Kernel
         # When quiet just discard and return.
         return
       else
+        # TODO: @@rootConsole isn't defined in Kernel. This needs some work when 
+        # we transition to a subclass of Sketchup::Console instead of redefining puts.
         # If the developer console isn't active, fall-back to standard ruby output
-        if @@rootConsole.nil? || !@@rootConsole.visible?
+        #if @@rootConsole.nil? || !@@rootConsole.visible? 
           send(output_method, *args)
-          return
-        end
+        #  return
+        #end
         
         # Otherwise route to the console via our outputContent method.
-        args = Developer::Bridge.clean_for_xml(args.join("\n"))
-        Developer::Console.outputContent(args, {"type"=>output_method.to_s.sub(/\!/,"") }) # TODO: improve value for "type"
-    
+        args.each{|arg|
+          type = output_method.to_s.sub(/\!/,"") # TODO: improve this.
+          Developer::Console.outputContent(arg.to_s, {"type"=>type})
+        }
       end
     end
 
