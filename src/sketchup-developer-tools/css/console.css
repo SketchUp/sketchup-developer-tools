@@ -8,7 +8,7 @@ Copyright 2012 Trimble Navigation Ltd.
 
 * {box-sizing:border-box;}
 html, body {
-  font-family: Arial, sans-serif;
+  font-family: message-box, sans-serif; /* using system font */
   font-size: 13px;
   overflow: hidden;
   height: 100%;
@@ -155,7 +155,7 @@ html, body {
 
   font-family: "Consolas", "Lucida Sans Typewriter", "Courier New", Courier, monospace;
   font-size: 14px;
-  line-height: 17px; /* don't removed, used for sizing */
+  line-height: 17px; /* don't remove, used for sizing */
 
 
   white-space: pre-wrap;
@@ -312,7 +312,6 @@ html, body {
   margin: 0px 4px;
 }
 #logged:hover {
-  background-color: white;
 }
 #logged label {
   
@@ -332,7 +331,6 @@ html, body {
   border: 1px solid transparent;
 }
 #plain:hover {
-  background-color: white;
 }
 #plain label {
 
@@ -351,7 +349,6 @@ html, body {
   border: 0px;
 }
 #quiet:hover {
-
 }
 #quiet label {
 }
@@ -437,7 +434,8 @@ div.output {
   border-right: 1px solid #aaa;
   border-bottom: 1px solid #aaa;
 
-  background: #f7f4ec; /* Old browsers */
+  color: ButtonText;
+  background: ButtonFace; /* Old browsers */
   background: -moz-linear-gradient(top,  #f7f4ec 0%, #d7d3cc 100%); /* FF3.6+ */
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f7f4ec), color-stop(100%,#d7d3cc)); /* Chrome,Safari4+ */
   background: -webkit-linear-gradient(top,  #f7f4ec 0%,#d7d3cc 100%); /* Chrome10+,Safari5.1+ */

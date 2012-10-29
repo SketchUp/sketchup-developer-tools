@@ -94,7 +94,7 @@ Original Author:: Matt Lowrie
       }
       divNav.appendChild(ulNav);
       // Views are already attached, so insert the nav before all elements
-      TESTUP_elements.gui.insertBefore(divNav, TESTUP_elements.gui.childNodes(0));
+      TESTUP_elements.gui.insertBefore(divNav, TESTUP_elements.gui.childNodes[0]);
     
       document.getElementById(TESTUP_prefs.session.selectedTab).className = 'on';
       document.getElementById('v_' + TESTUP_prefs.session.selectedTab).style.display = '';

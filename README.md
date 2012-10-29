@@ -25,7 +25,7 @@ If you're an owner of this repo, here are some steps.
 Get a local copy of the files. This will create a sketchup-stl folder.
 
 	git clone https://github.com/SketchUp/sketchup-developer-tools.git  
-	cd sketchup-stl  
+	cd sketchup-developer-tools 
 
 Use your favorite editor to edit README.md. Then...
 
