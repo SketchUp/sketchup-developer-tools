@@ -499,7 +499,7 @@ class TC_Point3d < Test::Unit::TestCase
     assert_nothing_raised do
      point1 = Geom::Point3d.new 10,10,10
      vector = Geom::Vector3d.new(0,0,1)
-     point2 = point1.offset! vector
+     point2 = point1.offset vector
     end
   end
 #--------------------------------------------------------------------------
