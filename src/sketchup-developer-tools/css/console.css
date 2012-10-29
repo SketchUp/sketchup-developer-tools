@@ -412,16 +412,38 @@ html, body {
   visibility: visible;
 }
 
-/* command input is wrapped in this style */
-div.input {
-  margin: 6px;
-  color: #999;
-  font-weight: bold;
+/* Indent each new line so that the icon can show. */
+/* #content > *:first-child, #content > :not(span) + * */
+#content .message:first-child, #content div.message, #content div.message + .message, #content br + .message {
+  padding-left: 15px;
+  border-top: 1px #ddd solid;
+}
+#content div.input + div.result, #content div.input + div.error {
+  border-top: 0;
+}
+#content div.input {
+  background: url("./icon_input.png") no-repeat scroll 0 0 transparent;
+}
+#content div.result {
+  background: url("./icon_result.png") no-repeat scroll 0 0 transparent;
+}
+#content div.error {
+  background: url("./icon_error.png") no-repeat scroll 0 0 transparent;
+}
+/* #content > .puts:first-child, #content > :not(.print) + .puts */
+#content .puts:first-child, #content div + .puts, #content br + .puts {
+  background: url("./icon_puts.png") no-repeat scroll 0 0 transparent;
+}
+/* #content > .print:first-child, #content > :not(.print) + .print */
+#content .print:first-child, #content div + .print, #content br + .print {
+  background: url("./icon_puts.png") no-repeat scroll 0 0 transparent;
 }
 
-/* command output is wrapped in this style */
-div.output {
-  margin: 6px;
+/* This overwrites some styles that might be set in the syntax highlighter theme. */
+#content pre code {
+  padding: 0;
+  background-color: transparent;
+  white-space: pre-wrap;
 }
 
 .button {
@@ -446,17 +468,26 @@ div.output {
 }
 
 .button:hover {
-  background: #f8f5ed; /* Old browsers */
-  background: -moz-linear-gradient(top,  #f8f5ed 0%, #d8d4cd 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f8f5ed), color-stop(100%,#d8d4cd)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  #f8f5ed 0%,#d8d4cd 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top,  #f8f5ed 0%,#d8d4cd 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top,  #f8f5ed 0%,#d8d4cd 100%); /* IE10+ */
-  background: linear-gradient(to bottom,  #f8f5ed 0%,#d8d4cd 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f8f5ed', endColorstr='#d8d4cd',GradientType=0 ); /* IE6-9 */
+  background: #fbf8ef; /* Old browsers */
+  background: -moz-linear-gradient(top,  #fbf8ef 0%, #dcd8d0 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fbf8ef), color-stop(100%,#dcd8d0)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  #fbf8ef 0%,#dcd8d0 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  #fbf8ef 0%,#dcd8d0 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  #fbf8ef 0%,#dcd8d0 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  #fbf8efd 0%,#dcd8d0 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fbf8ef', endColorstr='#dcd8d0',GradientType=0 ); /* IE6-9 */
 }
 
-
+.button:active {
+  background: #d3cfc8; /* Old browsers */
+  background: -moz-linear-gradient(top,  #d3cfc8 0%, #e7e4dc 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#d3cfc8), color-stop(100%,#e7e4dc)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  #d3cfc8 0%,#e7e4dc 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  #d3cfc8 0%,#e7e4dc 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  #d3cfc8 0%,#e7e4dc 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  #d3cfc8 0%,#e7e4dc 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d3cfc8', endColorstr='#e7e4dc',GradientType=0 ); /* IE6-9 */
+}
 
 .button-container {
   -moz-border-radius: 4px;
@@ -471,3 +502,21 @@ div.output {
   cursor: pointer;
 }
 
+
+.ui-collapsible-panel {
+}
+
+.ui-collapsible-header {
+  cursor: pointer
+}
+
+.ui-collapsible-content {
+}
+
+.ui-collapsible-panel.collapsed .ui-collapsible-content {
+  display: none;
+}
+
+.ui-collapsible-panel.collapsed .ui-collapsible-header {
+  cursor: pointer
+ }
