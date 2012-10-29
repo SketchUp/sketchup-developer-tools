@@ -414,9 +414,9 @@ html, body {
 
 /* Indent each new line so that the icon can show. */
 /* #content > *:first-child, #content > :not(span) + * */
-#content > *:first-child, #content div.message, #content div.message + *, #content br + *.message {
+#content .message:first-child, #content div.message, #content div.message + .message, #content br + .message {
   padding-left: 15px;
-  border-top: 1px #ccc solid;
+  border-top: 1px #ddd solid;
 }
 #content div.input + div.result, #content div.input + div.error {
   border-top: 0;
@@ -430,11 +430,11 @@ html, body {
 #content div.error {
   background: url("./icon_error.png") no-repeat scroll 0 0 transparent;
 }
-/* #content > .puts:first-child, #content > :not(span) + .puts */
+/* #content > .puts:first-child, #content > :not(.print) + .puts */
 #content .puts:first-child, #content div + .puts, #content br + .puts {
   background: url("./icon_puts.png") no-repeat scroll 0 0 transparent;
 }
-/* #content > .print:first-child, #content > :not(span) + .print */
+/* #content > .print:first-child, #content > :not(.print) + .print */
 #content .print:first-child, #content div + .print, #content br + .print {
   background: url("./icon_puts.png") no-repeat scroll 0 0 transparent;
 }
