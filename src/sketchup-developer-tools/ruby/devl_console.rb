@@ -219,31 +219,85 @@ class Console
   #
   # Args:
   # - data:  Object, the object to output via the console or puts!.
-  # - output_method:  Symbol, method to forward the data to. May be :puts! or 
+  # - output_method:  Symbol, method to forward the data to. May be :puts! or
   #    :print!
   #
-  def self.output(data, output_method=:puts!)
-    # If the developer console isn't active, fall-back to standard ruby output
-    if @@rootConsole.nil? || !@@rootConsole.visible?
-      # Note the ! here, which is how we alias the original puts function.
-      send(output_method, data)
-      return
+  def self.outputContent(output, metadata)
+    
+    obj = self.to_json(metadata)
+    output = output.inspect
+
+    unless @@rootConsole.nil? || !@@rootConsole.visible?
+      @@rootConsole.execute_script(
+        "try { console.appendContent(#{output}, #{obj})" +
+        "} catch (e) { console.appendContent(e, {'type': 'error'}) };")
     end
-
-    # Cleanse relative to newlines and quoting so we can ask the JS side to
-    # execute it effectively.
-    str = Bridge.clean_for_xml(str)
-    str = data.to_s.gsub(/\n/, '<br/>')
-    str = str.gsub(/([^\\])'/, "\1\\'")
-    # Abuse the fact that console.appendContent will plain write anything
-    # that "looks like markup"
-    str = '<span class="output">' + str + '</span>' if output_method == :print!
-
-    @@rootConsole.execute_script(
-      "try { console.appendContent('" + str + "')" + 
-      "} catch (e) { console.appendContent(e.message); }")
   end
 
+
+  # BEGIN PASTED
+  # TODO: put these two methods somewhere where they fit well (Bridge?)
+  # Make them private + instance methods (?)
+  
+  # Convert a json object into a Ruby hash.
+  #
+  # Args:
+  # - json_string: String of a json object.
+  #
+  # Returns:
+  # - Hash (or Array)
+  def self.from_json(json_string)
+    # Split at every even number of unescaped quotes; if it's not a string then replace : and null
+    # DEBUG: test objects with empty strings "", test arrays, test pure strings, test strings with : or => or " or \
+    ruby_string = json_string.split(/(\"(?:.*?[^\\])*?\")/).collect{|s| (s[0..0] != '"')? s.gsub(/\:/, "=>").gsub(/null/, "nil") : s }.join()
+    result = eval(ruby_string)
+    return result
+    rescue Exception => e
+      {}
+  end
+
+  # Convert a Ruby hash into a json string.
+  #
+  # Args:
+  # - obj: Ruby object containing any of String, Symbol, Fixnum, Float, Array, Hash, TrueClass, FalseClass, NilClass.
+  #
+  # Returns:
+  # - String of a json object, containing any of String, Fixnum, Float, Array, Object, true, false, null.
+  def self.to_json(obj)
+    # remove non-JSON objects
+    return "null" unless [String, Symbol, Fixnum, Float, Array, Hash, TrueClass, FalseClass, NilClass].inject(false){|b,c| b = (obj.is_a?(c))? true : b}
+    if obj.is_a? Array
+      obj.reject!{|k| ![String, Symbol, Fixnum, Float, Array, Hash, TrueClass, FalseClass, NilClass].inject(false){|b,c| b = (k.is_a?(c))? true : b} }
+    elsif obj.is_a? Hash
+      obj.reject!{|k,v|
+        !k.is_a?(String) && !k.is_a?(Symbol) ||
+        ![String, Symbol, Fixnum, Float, Array, Hash, TrueClass, FalseClass, NilClass].inject(false){|b,c| b = (v.is_a?(c))? true : b}
+      }
+    end
+    # split at every even number of unescaped quotes; if it's not a string then turn Symbols into String and replace => and nil
+    json_string = obj.inspect.split(/(\"(?:.*?[^\\])*?\")/).collect{|s| (s[0..0] != '"')? s.gsub(/\:(\S+?(?=\=>|\s))/, "\"\\1\"").gsub(/=>/, ":").gsub(/\bnil\b/, "null") : s }.join()
+    return json_string
+  end
+  # END
+  
+  # Log a message to a log file.
+  #
+  # Args:
+  # - str: String, the message to log to a file.
+  #
+  def self.log(str)
+    path = Developer::Console.log_file
+    timestamp = Developer::Console.timestamp? ? Time.now.to_s + ' ' : ''
+    begin
+      # Open is an 'append'. Clearing the log is a separate operation.
+      open(path, 'a') do |f|
+        f << timestamp + str.to_s + "\n"
+      end
+    rescue Exception => e
+      puts! "#{e.class}: #{e.message}"
+    end
+  end
+  
   # Sets the default "quiet" flag for all consoles. Individual consoles can
   # override this setting based on their configuration at execution time.
   # The quiet flag determines whether Kernel::puts output is discarded.
@@ -278,8 +332,8 @@ class Console
 
   # Updates the default history list data. This method is typically called
   # from the history file itself during console initialization.
-  # 
-  # 
+  #
+  #
   # Args:
   # - data: Array, the array of history entries to set.
   #
@@ -291,7 +345,7 @@ class Console
   # typically invoked by a config.rb file being loaded from the extention's
   # directory. Note that the items in the incoming Hash simply overlay those
   # in the default @@config property so the incoming data can be sparse.
-  # 
+  #
   #
   # Args:
   # - data:  Hash, A configuration hash containing items for @@config use.
@@ -299,7 +353,7 @@ class Console
   def self.updateConfig(data)
     if !data.nil?
       data.each do |key, value|
-        @@config[key] = value 
+        @@config[key] = value
       end
     end
   end
@@ -309,7 +363,7 @@ class Console
   # however, that the Console class overrides 'new' so that instances are
   # reused during a particular session.
   #
-  # 
+  #
   def initialize
 
     # Load the configuration from file if possible, so users can override
@@ -329,9 +383,9 @@ class Console
 
     width = @config[:width]
     height = @config[:height]
-    x = @config[:x] 
+    x = @config[:x]
     y =  @config[:y]
- 
+
     # Assign a title. We'll look this up in the string table in a moment.
     title = 'Developer Console'
 
@@ -343,9 +397,9 @@ class Console
     # ones. Note that the first instance in this list is the Root Console.
     @@instances.push(@dialog)
     if @@instances.length == 1
-      @@rootConsole = @dialog 
+      @@rootConsole = @dialog
     end
-  
+
     # Constrain to avoid clipping of toolbar and 3-5 lines of content.
     @dialog.min_height = @config[:minheight]
     @dialog.min_width = @config[:minwidth]
@@ -373,13 +427,13 @@ class Console
     # Once we've loaded any custom extensions we can now add the action
     # callbacks which might include some defined by the user.
     self.methods.grep(/^do_/).each do |name|
-      eval %{ 
+      eval %{
         @dialog.add_action_callback("#{name}") { |d,p| #{name}(d,p) }
       }, nil, __FILE__, __LINE__
     end
 
     # Update configuration to have full paths for JS-relevant parameters. We
-    # do this before showing the dialog so it's 
+    # do this before showing the dialog so it's
     path = Sketchup.find_support_file @config[:usercss], @@config[:toolroot]
     if (path)
       @config[:usercss] = path
@@ -388,7 +442,7 @@ class Console
     if (path)
       @config[:userjs] = path
     end
-   
+
     # Update paths for help file(s) we want to display.
     path = Sketchup.find_support_file(@config[:toolhelp], @@config[:toolroot])
     if (path)
@@ -400,10 +454,10 @@ class Console
     self.show
 
   end
-  
+
   # Responds to requests to clear the current log file. No query parameters
   # are necessary for this call.
-  # 
+  #
   #
   # Args:
   # - dialog: reference to the WebDialog that made the original request.
@@ -427,7 +481,7 @@ class Console
     end
 
     puts msg
-    Bridge.js_callback(dialog, 'do_exec', query, msg, fault) 
+    Bridge.js_callback(dialog, 'do_exec', query, msg, fault)
   end
 
   # Responds to requests to execute a string of Ruby source code. This is the
@@ -435,7 +489,7 @@ class Console
   # be placed in the query as 'command'. Additional parameters for 'logging'
   # and 'quiet' may be provided to define those flag values.
   #
-  # 
+  #
   # Args:
   # - dialog: reference to the WebDialog that made the original request.
   # - query: the query string, the portion of a skp: URL after the @ sign.
@@ -446,6 +500,11 @@ class Console
     Console.quiet = params['quiet']
 
     buffer = params['command']
+
+    # Output the buffer/command string to the log.
+    puts!('> ' + buffer)
+    Developer::Console.log('> ' + buffer)
+
     begin
       # Note we do the eval here in the context of a reused proc. This
       # approach means that each call can build upon prior results and
@@ -453,46 +512,29 @@ class Console
       result = eval(buffer, TOPLEVEL_BINDING)
       fault = false
 
-      # Now it turns out that inspect likes to, misbehave in some sense, in
-      # that a string that started out as str='blah"s' will end up as
-      # str="blah"s" which is ok from a Ruby sense but not a JavaScript one.
-      # Here we massage that case a little to mirror what a Ruby user expects.
-      if result.kind_of? String
-        result = '"' + result.gsub(/([^\\])"/, '\1\\"') + '"'
-      else
-        result = result.nil? ? 'nil' : Bridge.clean_for_xml(result.inspect)
-      end
+      result = result.inspect
+      Developer::Console.outputContent(result, {"type"=>"ruby result"})
 
     rescue Exception => e
+      result = e.class.to_s + ': ' + e.message.to_s
       # When eval is called with TOPLEVEL_BINDING it's the first item in the
       # traceback that refer to the developer console. We omit this as it's
       # misleading.
-      trace = e.backtrace[1..-1].join("\n")
-      result = Bridge.clean_for_xml("#{e.class}: #{e.message}\n#{trace}")
+      backtrace = e.backtrace[1..-1]
+      # Send the error to the output:
+      Developer::Console.outputContent(result, {"backtrace"=>backtrace, "type"=>"error"})
       fault = true
     end
-  
-    
 
-    # Before we output the result we'll output the buffer/command string.
-    # The one trick here is that we don't want it to echo to the console
-    # since the console does that on the JavaScript side.
-    quiet = Console.quiet?
-    Console.nolog = true
-    Console.quiet = true
-    puts('> ' + buffer)
-    Console.quiet = quiet
-    Console.nolog = false
-
-    puts(result)
-    Bridge.js_callback(dialog, 'do_exec', query, result, fault) 
+    result = Bridge.clean_for_xml(result)
+    Bridge.js_callback(dialog, 'do_exec', query, result, fault) # TODO: What does this?
   end
 
   # Responds to requests to return the current configuration data. The
   # client JavaScript makes this request during initialization. There are no
   # specific query string parameters for this call.
   #
-  # 
+  #
   # Args:
   # - dialog: reference to the WebDialog that made the original request.
   # - query: the query string, the portion of a skp: URL after the @ sign.
@@ -507,14 +549,14 @@ class Console
     info = Bridge.clean_for_json(@config.inspect)
     info = '{' + info.gsub(/([{ ]):/, ' \'').gsub(/=>/,'\': ')
 
-    Bridge.js_callback(dialog, 'do_get_config', query, info, false) 
+    Bridge.js_callback(dialog, 'do_get_config', query, info, false)
   end
 
   # Responds to requests to return any stored history list data. The
   # client JavaScript makes this request during initialization. There are no
   # specific query string parameters for this call.
   #
-  # 
+  #
   # Args:
   # - dialog: reference to the WebDialog that made the original request.
   # - query: the query string, the portion of a skp: URL after the @ sign.
@@ -530,13 +572,13 @@ class Console
     info = @@history.inspect
     info = info.gsub(/\\/, "\\\\\\\\")
 
-    Bridge.js_callback(dialog, 'do_get_history', query, info, false) 
+    Bridge.js_callback(dialog, 'do_get_history', query, info, false)
   end
 
   # Responds to requests to update the default logging status. The new flag
   # value should be provided in the 'logging' query string parameter.
   #
-  # 
+  #
   # Args:
   # - dialog: reference to the WebDialog that made the original request.
   # - query: the query string, the portion of a skp: URL after the @ sign.
@@ -545,15 +587,15 @@ class Console
     params = Bridge.query_to_hash(dialog, query)
     Console.logging = params['logging']
     Console.quiet = params['quiet']
-    
-    Bridge.js_callback(dialog, 'do_logging', query, Console.logging?.to_s, 
-        false) 
+
+    Bridge.js_callback(dialog, 'do_logging', query, Console.logging?.to_s,
+        false)
   end
 
   # Responds to requests to update the default quiet-mode status. Quiet-mode
   # is when normal Kernel::puts output is discarded. The new quiet mode flag
   # value should be provided in the 'quiet' query string parameter.
-  # 
+  #
   #
   # Args:
   # - dialog: reference to the WebDialog that made the original request.
@@ -564,7 +606,7 @@ class Console
     Console.logging = params['logging']
     Console.quiet = params['quiet']
 
-    Bridge.js_callback(dialog, 'do_quiet', query, Console.quiet?.to_s, false) 
+    Bridge.js_callback(dialog, 'do_quiet', query, Console.quiet?.to_s, false)
   end
 
   # Responds to requests to reload some or all of the Ruby scripts found
@@ -576,7 +618,7 @@ class Console
   # and 'logging' query string parameters may be provided to update those
   # flags prior to execution.
   #
-  # 
+  #
   # Args:
   # - dialog: reference to the WebDialog that made the original request.
   # - query: the query string, the portion of a skp: URL after the @ sign.
@@ -600,7 +642,7 @@ class Console
       next unless path =~ /[pP]lugins|[tT]ools/
       next unless path =~ @config[:reload]
       begin
-        if load path 
+        if load path
           msgs.push(prefix + path)
         end
       rescue Exception => e
@@ -614,12 +656,12 @@ class Console
     # this tendency to reset things...like logging state...to off :).
     Console.nolog = true
     Console.logging = logging
-    puts msg 
+    puts msg
     Console.logging = params['logging']
     Console.nolog = false
 
     msg = 'Reloaded ' + msgs.length.to_s + ' files.'
-    Bridge.js_callback(dialog, 'do_reload', query, msg, fault) 
+    Bridge.js_callback(dialog, 'do_reload', query, msg, fault)
   end
 
   # Responds to requests to save the current history list. The history
@@ -627,7 +669,7 @@ class Console
   # itself is stored to the file referenced in @config[:history] and should
   # be provided as the 'history' query string parameter.
   #
-  # 
+  #
   # Args:
   # - dialog: reference to the WebDialog that made the original request.
   # - query: the query string, the portion of a skp: URL after the @ sign.
@@ -638,7 +680,7 @@ class Console
     Console.quiet = params['quiet']
 
     history = params['history']
-    
+
     template = <<END
 #!/usr/bin/ruby -w
 #
@@ -662,7 +704,7 @@ END
 
     puts msg
 
-    Bridge.js_callback(dialog, 'do_save_history', query, msg, false) 
+    Bridge.js_callback(dialog, 'do_save_history', query, msg, false)
   end
 
   # Shows overview help for the console.
@@ -675,7 +717,7 @@ END
   def do_show_overview(dialog, query)
     url = @config[:toolhelp]
     UI.openURL(url)
-    Bridge.js_callback(dialog, 'do_show_overview', query, url, false) 
+    Bridge.js_callback(dialog, 'do_show_overview', query, url, false)
   end
 
   # Shows shortcut help for the console.
@@ -687,7 +729,7 @@ END
   #
   def do_show_shortcuts(dialog, query)
     msg = $devl_strings.GetString('shortcut_help');
-    Bridge.js_callback(dialog, 'do_show_shortcuts', query, msg, false) 
+    Bridge.js_callback(dialog, 'do_show_shortcuts', query, msg, false)
   end
 
   # Hides the receiver's internal web dialog control.
@@ -698,7 +740,7 @@ END
 
   # Returns true if the console's dialog is currently visible.
   #
-  # 
+  #
   # Returns:
   # - flag: Boolean, true if the console's dialog is currently visible.
   #
@@ -743,32 +785,35 @@ module Kernel
     #
     #
     # Args:
-    # - args: Object, the object (usually a string) to output.
     # - output_method:  Symbol, method to forward the data to. May be :puts! or
     #    :print!
-    # 
-    def puts_or_print(args, output_method)
+    # - args: Object, the object (usually a string) to output.
+    #
+    # TODO: do we need this method really?
+    def puts_or_print(output_method, *args)
       # Regardless of whether we're in quiet mode or not we respect the
       # logging setting if set.
       if Developer::Console.logging?
-        path = Developer::Console.log_file
-        timestamp = Developer::Console.timestamp? ? Time.now.to_s + ' ' : ''
-        begin
-          # Open is an 'append'. Clearing the log is a separate operation.
-          open(path, 'a') do |f|
-            f << timestamp + args.to_s + "\n"
-          end
-        rescue Exception => e
-          puts! "#{e.class}: #{e.message}"
-        end
+        Developer::Console.log(*args) # TODO: support for print (or output_method)
       end
 
       if Developer::Console.quiet?
         # When quiet just discard and return.
         return
       else
-        # Route to the console via our output method.
-        Developer::Console.output(args, output_method)
+        # TODO: @@rootConsole isn't defined in Kernel. This needs some work when 
+        # we transition to a subclass of Sketchup::Console instead of redefining puts.
+        # If the developer console isn't active, fall-back to standard ruby output
+        #if @@rootConsole.nil? || !@@rootConsole.visible? 
+          send(output_method, *args)
+        #  return
+        #end
+        
+        # Otherwise route to the console via our outputContent method.
+        args.each{|arg|
+          type = output_method.to_s.sub(/\!/,"") # TODO: improve this.
+          Developer::Console.outputContent(arg.to_s, {"type"=>type})
+        }
       end
     end
 
@@ -778,8 +823,8 @@ module Kernel
     #
     # Args:
     # - args: Object, the object (usually a string) to output.
-    def puts(args)
-      puts_or_print(args, :puts!)
+    def puts(*args)
+      puts_or_print(:puts!, *args)
       return
     end
 
@@ -789,8 +834,8 @@ module Kernel
     #
     # Args:
     # - args: Object, the object (usually a string) to output.
-    def print(args)
-      puts_or_print(args, :print!)
+    def print(*args)
+      puts_or_print(:print!, *args)
       return
     end
 
