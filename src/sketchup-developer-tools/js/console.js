@@ -379,42 +379,26 @@ console.resizeCommandCell = function() {
     // Downsize to force scrollHeight to tell us the right size for the
     // content without scrolling.
     textarea.style.height = '0px';
-    var height = textarea.scrollHeight;
-    textarea.style.height = 'auto';
-
-    // Don't let height exceed content area size, and adjust overflow when we
-    // have to truncate the height due to extra large input (from paste etc).
-    height = height + console.TEXTAREA_CHROME;
-    height = Math.min(height, max);
-    height = Math.max(height, console.TEXTAREA_LINEHEIGHT +
-        console.TEXTAREA_CHROME);
-    if (height == max) {
-      textarea.style.overflow = 'auto';
-    } else {
-      textarea.style.overflow = 'hidden';
-    }
-  } else {
-    var rows = textarea.value.split('\n').length;
-    textarea.setAttribute('rows', rows);
-    height = su.elementGetBorderBox(textarea).height +
-          console.TEXTAREA_CHROME - 4;
-
-    // We run into a problem when the row count would put the textarea at a
-    // size larger than our "max size" so at that point we have to roll back
-    // the row count and turn on scrolling.
-    textarea.style.overflow = 'hidden';
-    var currentHeight = height;
-    while ((height > max) && (rows > 0)) {
-      rows -= 1;
-      textarea.setAttribute('rows', rows);
-      height = su.elementGetBorderBox(textarea).height +
-          console.TEXTAREA_CHROME - 4;
-      if (height == currentHeight) {
-        break;
-      }
-      textarea.style.overflow = 'scroll';
-    }
   }
+  var height = textarea.scrollHeight;
+  if (su.IS_MAC) {
+    textarea.style.height = 'auto';
+  } else {
+    textarea.style.height = height + 'px';
+  }
+
+  // Don't let height exceed content area size, and adjust overflow when we
+  // have to truncate the height due to extra large input (from paste etc).
+  height = height + console.TEXTAREA_CHROME;
+  height = Math.min(height, max);
+  height = Math.max(height, console.TEXTAREA_LINEHEIGHT +
+      console.TEXTAREA_CHROME);
+  if (height == max) {
+    textarea.style.overflow = 'auto';
+  } else {
+    textarea.style.overflow = 'hidden';
+  }
+
 
   // Update the containing footer height and the textarea will update its
   // size based on our CSS height settings.
@@ -464,7 +448,7 @@ console.appendContent = function(output, metadata) {
     backtrace = backtrace.join('<br>');
     // Shorten long file paths to make it easier to read.
     backtrace = backtrace.replace(/((?:[A-Z]\:|\/)[^\:]+)/g, function(filepath){
-	    // Truncate the Plugins folder, or as fallback keep only the filename.
+      // Truncate the Plugins folder, or as fallback keep only the filename.
       var relpath = /\/[Pp]lugins\//.test(filepath)? filepath.replace(/^.*\/[Pp]lugins\//,"") : filepath.match(/[^\/]+$/);
       if(relpath == filepath){ return filepath };
       var truncated = '<a onclick="this.innerHTML=(this.innerHTML!=\'…\')? \'…\' : \'' + filepath.replace("/"+relpath,"") + '\'">…</a>/';
@@ -489,7 +473,7 @@ console.appendContent = function(output, metadata) {
   }
   // Anything else.
   else {
-	  // Highlight Ruby code.
+    // Highlight Ruby code.
     if ( /ruby/.test(type) && su.isDefined(hljs) ) {
       output = '<pre><code>' + hljs.highlight('ruby', output).value + '</code></pre>';
     };
@@ -900,7 +884,7 @@ console.handleKeyDown = function(evt, opt_manualKeycode) {
         return;
       }
       break;
-      
+
     case su.ARROW_DOWN_KEY:
       var caretPosition = console.getCaretPosition($('command'));
       var parts = $('command').value.split(/\n/);
