@@ -232,6 +232,7 @@ class Console
         "try { console.appendContent(#{output}, #{obj})" +
         "} catch (e) { console.appendContent(e, {'type': 'error'}) };")
     end
+
   end
 
 
@@ -285,7 +286,7 @@ class Console
   # Args:
   # - str: String, the message to log to a file.
   #
-  def self.log(str)
+  def self.log(str="")
     path = Developer::Console.log_file
     timestamp = Developer::Console.timestamp? ? Time.now.to_s + ' ' : ''
     begin
@@ -501,9 +502,12 @@ class Console
 
     buffer = params['command']
 
-    # Output the buffer/command string to the log.
+    # Output the buffer/command string on the native console.
     puts!('> ' + buffer)
-    Developer::Console.log('> ' + buffer)
+    # Send it to the log file.
+    if Developer::Console.logging?
+      Developer::Console.log('> ' + buffer)
+    end
 
     begin
       # Note we do the eval here in the context of a reused proc. This
@@ -524,6 +528,12 @@ class Console
       # Send the error to the output:
       Developer::Console.outputContent(result, {"backtrace"=>backtrace, "type"=>"error"})
       fault = true
+    end
+
+    # Send it to the log file.
+    if Developer::Console.logging?
+      Developer::Console.log(result)
+      Developer::Console.log(backtrace.join("\n")) if backtrace && !backtrace.empty?
     end
 
     result = Bridge.clean_for_xml(result)
