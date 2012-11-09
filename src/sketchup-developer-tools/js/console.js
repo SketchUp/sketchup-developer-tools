@@ -238,13 +238,14 @@ console.exec_h = console.exec_help;
  * @param {string} script The string to evaluate.
  */
 console.exec_js = function(script) {
-  var type = "javascript"
+  var type = "javascript";
   try {
     result = window.eval(script);
-    type += " result"
+    result = String(result); // or better IE8+ JSON.stringify(result);
+    type += " result";
   } catch (e) {
     result = e.message;
-    type += " error"
+    type += " error";
   }
 
   console.appendContent(result, {'type': type});
@@ -325,6 +326,7 @@ console.execCommandCell = function() {
 
   // Anything starting with a \ is a command line, not an eval buffer.
   if (cmd.indexOf('\\') == 0) {
+    console.appendContent(cmd, {'type': 'command input'});
     var parts = cmd.slice(1).split(' ');
     cmd = parts[0];
     var fname = 'exec_' + cmd;
@@ -448,7 +450,7 @@ console.appendContent = function(output, metadata) {
   var str = su.trimWhitespace(content.innerHTML);
   metadata = metadata || {};
   var type = metadata['type'] || 'other';
-  
+
   // We do all xml markup only here:
   // Prepare all <,> for xml, except if the syntax highlighter does it for us.
   if ( !/ruby/.test(type) ) {
