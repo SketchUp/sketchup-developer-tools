@@ -413,3 +413,30 @@ html, body {
 .ui-collapsible-panel.collapsed .ui-collapsible-header {
   cursor: pointer
  }
+
+
+/*  -------
+    inverted style tweaks
+*/
+
+
+/* separator lines for inverted background */
+#content.reverse .message:first-child, #content.reverse div.message, #content.reverse div.message + .message, #content.reverse br + .message {
+  border-top: 1px #333 solid;
+}
+
+/* font color for highlighted text */
+#content.reverse pre code {
+  color: #ccc;
+}
+
+#content.reverse pre .keyword,
+#content.reverse pre .css .rule .keyword,
+#content.reverse pre .winutils,
+#content.reverse pre .javascript .title,
+#content.reverse pre .nginx .title,
+#content.reverse pre .subst,
+#content.reverse pre .request,
+#content.reverse pre .status {
+  color: #ccc;
+}
