@@ -391,7 +391,7 @@ class Console
 
     # Create the dialog instance this console is managing.
     @dialog = UI::WebDialog.new($devl_strings.GetString(title),
-      true, title, width, height, x, y, true)
+      false, title, width, height, x, y, true)
 
     # Capture instances in a class-level list so we can reuse non-visible
     # ones. Note that the first instance in this list is the Root Console.
