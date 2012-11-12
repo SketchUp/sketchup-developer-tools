@@ -157,32 +157,17 @@ html, body {
   font-size: 14px;
   line-height: 17px; /* don't remove, used for sizing */
 
-
   white-space: pre-wrap;
 }
 
 #go {
   float: right;
-  position: relative;
-  top: .5em;
-  bottom: .5em;
-  width: 2em;
+  width: 3em;
   margin: 0px 9px 0px 12px;
-  width: 50px;
 }
 #go a {
   float: right;
-  position: relative;
-  top: 0;
-  bottom: 0;
   width: 100%;
-  text-align: center;
-  line-height: 1.5em;
-  cursor: pointer;
-  padding: 0px 6px 0px 6px;
-}
-#go a:hover {
-
 }
 
 /*  -------
@@ -191,116 +176,47 @@ html, body {
 
 #clear {
   float: left;
-  position: relative;
-  top: .5em;
-  bottom: .5em;
   width: 5em;
   margin: 0px 6px;
 }
 #clear a {
   float:left;
-  position: relative;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  
-  text-align: center;
-  line-height: 1.5em;
-  cursor: pointer;
 }
-#clear a:hover {
-  background-color: white;
-}
-
 
 #help {
   float: right;
-  position: relative;
-  top: .5em;
-  bottom: .5em;
   width: 5em;
   margin: 0px 18px 0px 12px;
 }
 #help a {
   float: right;
-  position: relative;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  line-height: 1.5em;
-  cursor: pointer;
-}
-#help a:hover {
-  background-color: white;
 }
 
 #invert {
   float: right;
-  position: relative;
-  top: .5em;
-  bottom: .5em;
   width: 2em;
   margin: 0px 3px;
-  cursor: pointer;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  -khtml-border-radius: 4px;
-  border-radius: 4px;
-  border-top: 1px solid #aaa;
-  border-left: 1px solid #aaa;
-  border-right: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-  -webkit-user-select: none;
-  cursor: pointer;
 }
 #invert a {
   float: right;
-  position: relative;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  line-height: 1.5em;
-  cursor: pointer;
 }
 #invert.reverse a {
   color: #eee;
   background-color: black;
-  text-align: center;
-  line-height: 2.2em;
-  font-size: 9px;
   filter: none;
-  border-top: 1px solid #aaa;
-  border-left: 1px solid #aaa;
-  border-right: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
 }
 #invert a:hover {
   background-color: #999;
+  filter: none;
 }
 
 #larger {
   float: right;
-  position: relative;
-  top: .5em;
-  bottom: .5em;
   width: 2em;
   margin: 0px 3px;
 }
 #larger a {
   float: right;
-  position: relative;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  line-height: 1.5em;
-  cursor: pointer;
-}
-#larger a:hover {
-  background-color: white;
 }
 
 #logged {
@@ -311,13 +227,9 @@ html, body {
   width: 6em;
   margin: 0px 4px;
 }
-#logged:hover {
-}
 #logged label {
-  
 }
 #logged input {
-  
 }
 
 #plain {
@@ -327,16 +239,11 @@ html, body {
   bottom: .5em;
   width: 5em;
   margin: 0px 4px;
-
   border: 1px solid transparent;
 }
-#plain:hover {
-}
 #plain label {
-
 }
 #plain input {
-
 }
 
 #quiet {
@@ -348,8 +255,6 @@ html, body {
   margin: 0px 4px;
   border: 0px;
 }
-#quiet:hover {
-}
 #quiet label {
 }
 #quiet input {
@@ -357,47 +262,22 @@ html, body {
 
 #reload {
   float: left;
-  position: relative;
-  top: .5em;
-  bottom: .5em;
   width: 5em;
   margin: 0px 12px 0px 6px;
 }
 #reload a {
   float: left;
-  position: relative;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  line-height: 1.5em;
-  cursor: pointer;
-}
-#reload a:hover {
-  background-color: white;
 }
 
 #smaller {
   float: right;
-  position: relative;
-  top: .5em;
-  bottom: .5em;
   width: 2em;
   margin: 0px 3px;
 }
 #smaller a {
   float: right;
-  position: relative;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
   line-height: 2.2em;
   font-size: 9px;
-  cursor: pointer;
-}
-#smaller a:hover {
-  background-color: white;
 }
 
 /*  -------
@@ -447,6 +327,14 @@ html, body {
 }
 
 .button {
+  position: relative;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  line-height: 1.5em;
+  cursor: pointer;
+
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   -khtml-border-radius: 3px;
@@ -490,6 +378,11 @@ html, body {
 }
 
 .button-container {
+  position: relative;
+  top: .5em;
+  bottom: .5em;
+  width: 2em;
+
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
   -khtml-border-radius: 4px;
@@ -520,3 +413,30 @@ html, body {
 .ui-collapsible-panel.collapsed .ui-collapsible-header {
   cursor: pointer
  }
+
+
+/*  -------
+    inverted style tweaks
+*/
+
+
+/* separator lines for inverted background */
+#content.reverse .message:first-child, #content.reverse div.message, #content.reverse div.message + .message, #content.reverse br + .message {
+  border-top: 1px #333 solid;
+}
+
+/* font color for highlighted text */
+#content.reverse pre code {
+  color: #ccc;
+}
+
+#content.reverse pre .keyword,
+#content.reverse pre .css .rule .keyword,
+#content.reverse pre .winutils,
+#content.reverse pre .javascript .title,
+#content.reverse pre .nginx .title,
+#content.reverse pre .subst,
+#content.reverse pre .request,
+#content.reverse pre .status {
+  color: #ccc;
+}

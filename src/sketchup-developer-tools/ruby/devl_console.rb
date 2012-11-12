@@ -5,7 +5,7 @@
 #
 # The Developer Console is a command-line interface to Ruby and JavaScript.
 # Major goals of the console are multi-line input, reloading of scripts
-# without requiring a SketchUp restart, and a high level of control over 
+# without requiring a SketchUp restart, and a high level of control over
 # output processing. This latter aspect includes being able to turn off
 # console output during performance-sensitive operations, being able to
 # write the console output to a log file, altering font size, etc.
@@ -35,7 +35,7 @@ class Console
     :y => 0,                          # top coordinate on opening
     :width => 711,                    # default width (roughly 1.618 h)
     :height => 440,                   # default height (usable of 800x600)
-    :minwidth => 450,                 # keep toolbar from clip/float 
+    :minwidth => 450,                 # keep toolbar from clip/float
     :minheight => 175,                # keep 3-5 lines of content visible
 
     :consolemax => 1,                 # only 1 console by default
@@ -87,7 +87,7 @@ class Console
 
   end
 
-  # Returns the path to the currently defined console history file. 
+  # Returns the path to the currently defined console history file.
   #
   #
   # Returns:
@@ -102,7 +102,7 @@ class Console
     return path
   end
 
-  # Returns the path to the currently defined console log file. 
+  # Returns the path to the currently defined console log file.
   #
   #
   # Returns:
@@ -175,13 +175,13 @@ class Console
     if @@instances.length > 0
       dialog = @@instances.find {|dlg| !dlg.visible? }
     end
-  
+
     # If we didn't find a previous instance we have to look to consolemax
     # vs. the current length of the instances list before we can decide what
     # to do next. When we have "room" to create a new instance we call
     # super to get it built. If there's a reason why we have no console yet
     # we create one, otherwise we return the first instance (root console).
-    if dialog.nil? 
+    if dialog.nil?
 
       if @@config[:consolemax] > @@instances.length
         return super
@@ -195,7 +195,7 @@ class Console
     end
 
   end
- 
+
   # Turns off logging of state changes, particularly to the logging and
   # quiet mode flags which have to sometimes be manipulated behind the
   # scenes.
@@ -203,8 +203,8 @@ class Console
     nolog = (flag == true || flag == 'true')
     @@nolog = nolog
   end
- 
-  # Returns the current nolog state change logging flag value. 
+
+  # Returns the current nolog state change logging flag value.
   #
   #
   # Returns:
@@ -223,7 +223,7 @@ class Console
   #    :print!
   #
   def self.outputContent(output, metadata)
-    
+
     obj = self.to_json(metadata)
     output = output.inspect
 
@@ -232,13 +232,14 @@ class Console
         "try { console.appendContent(#{output}, #{obj})" +
         "} catch (e) { console.appendContent(e, {'type': 'error'}) };")
     end
+
   end
 
 
   # BEGIN PASTED
   # TODO: put these two methods somewhere where they fit well (Bridge?)
   # Make them private + instance methods (?)
-  
+
   # Convert a json object into a Ruby hash.
   #
   # Args:
@@ -279,13 +280,13 @@ class Console
     return json_string
   end
   # END
-  
+
   # Log a message to a log file.
   #
   # Args:
   # - str: String, the message to log to a file.
   #
-  def self.log(str)
+  def self.log(str="")
     path = Developer::Console.log_file
     timestamp = Developer::Console.timestamp? ? Time.now.to_s + ' ' : ''
     begin
@@ -297,7 +298,7 @@ class Console
       puts! "#{e.class}: #{e.message}"
     end
   end
-  
+
   # Sets the default "quiet" flag for all consoles. Individual consoles can
   # override this setting based on their configuration at execution time.
   # The quiet flag determines whether Kernel::puts output is discarded.
@@ -371,7 +372,7 @@ class Console
     # new instance initialization it's possible to update the configuration
     # before each new console creation.
     path = Sketchup.find_support_file 'config.rb', @@config[:toolroot]
-    if path 
+    if path
       load path
     end
 
@@ -391,7 +392,7 @@ class Console
 
     # Create the dialog instance this console is managing.
     @dialog = UI::WebDialog.new($devl_strings.GetString(title),
-      true, title, width, height, x, y, true)
+      false, title, width, height, x, y, true)
 
     # Capture instances in a class-level list so we can reuse non-visible
     # ones. Note that the first instance in this list is the Root Console.
@@ -501,9 +502,12 @@ class Console
 
     buffer = params['command']
 
-    # Output the buffer/command string to the log.
+    # Output the buffer/command string on the native console.
     puts!('> ' + buffer)
-    Developer::Console.log('> ' + buffer)
+    # Send it to the log file.
+    if Developer::Console.logging?
+      Developer::Console.log('> ' + buffer)
+    end
 
     begin
       # Note we do the eval here in the context of a reused proc. This
@@ -524,6 +528,12 @@ class Console
       # Send the error to the output:
       Developer::Console.outputContent(result, {"backtrace"=>backtrace, "type"=>"error"})
       fault = true
+    end
+
+    # Send it to the log file.
+    if Developer::Console.logging?
+      Developer::Console.log(result)
+      Developer::Console.log(backtrace.join("\n")) if backtrace && !backtrace.empty?
     end
 
     result = Bridge.clean_for_xml(result)
@@ -758,6 +768,19 @@ END
     @html = File.dirname(__FILE__) + '/../html/console.html'
     @dialog.set_file(@html, nil)
     @dialog.show
+    @dialog.execute_script("document.getElementsByTagName('body')[0].style.background='"+@dialog.get_default_dialog_color+"'")
+
+    # Catch ScriptErrors. Not a nice solution, but urgently needed.
+    @last_error_id = $!.object_id
+    # Since eval and $stderr (why?) don't catch script errors, we regularly look into the Ruby global $!
+    @catch_script_error = Proc.new{
+      if visible? && $!.object_id != @last_error_id
+        Developer::Console.outputContent($!.to_s, {"type"=>"error", "backtrace"=>$@})
+        @last_error_id = $!.object_id
+      end
+      UI.start_timer(0.1, false){@catch_script_error.call if visible?}
+    }
+    @catch_script_error.call
   end
 
 end   # End of Console class
@@ -801,14 +824,14 @@ module Kernel
         # When quiet just discard and return.
         return
       else
-        # TODO: @@rootConsole isn't defined in Kernel. This needs some work when 
+        # TODO: @@rootConsole isn't defined in Kernel. This needs some work when
         # we transition to a subclass of Sketchup::Console instead of redefining puts.
         # If the developer console isn't active, fall-back to standard ruby output
-        #if @@rootConsole.nil? || !@@rootConsole.visible? 
+        #if @@rootConsole.nil? || !@@rootConsole.visible?
           send(output_method, *args)
         #  return
         #end
-        
+
         # Otherwise route to the console via our outputContent method.
         args.each{|arg|
           type = output_method.to_s.sub(/\!/,"") # TODO: improve this.
