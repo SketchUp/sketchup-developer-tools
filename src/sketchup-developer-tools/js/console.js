@@ -238,13 +238,14 @@ console.exec_h = console.exec_help;
  * @param {string} script The string to evaluate.
  */
 console.exec_js = function(script) {
-  var type = "javascript"
+  var type = "javascript";
   try {
     result = window.eval(script);
-    type += " result"
+    result = String(result); // or better IE8+ JSON.stringify(result);
+    type += " result";
   } catch (e) {
     result = e.message;
-    type += " error"
+    type += " error";
   }
 
   console.appendContent(result, {'type': type});
@@ -325,6 +326,7 @@ console.execCommandCell = function() {
 
   // Anything starting with a \ is a command line, not an eval buffer.
   if (cmd.indexOf('\\') == 0) {
+    console.appendContent(cmd, {'type': 'command input'});
     var parts = cmd.slice(1).split(' ');
     cmd = parts[0];
     var fname = 'exec_' + cmd;
@@ -377,41 +379,24 @@ console.resizeCommandCell = function() {
     // Downsize to force scrollHeight to tell us the right size for the
     // content without scrolling.
     textarea.style.height = '0px';
-    var height = textarea.scrollHeight;
+  }
+  var height = textarea.scrollHeight;
+  if (su.IS_MAC) {
     textarea.style.height = 'auto';
-
-    // Don't let height exceed content area size, and adjust overflow when we
-    // have to truncate the height due to extra large input (from paste etc).
-    height = height + console.TEXTAREA_CHROME;
-    height = Math.min(height, max);
-    height = Math.max(height, console.TEXTAREA_LINEHEIGHT +
-        console.TEXTAREA_CHROME);
-    if (height == max) {
-      textarea.style.overflow = 'auto';
-    } else {
-      textarea.style.overflow = 'hidden';
-    }
   } else {
-    var rows = textarea.value.split('\n').length;
-    textarea.setAttribute('rows', rows);
-    height = su.elementGetBorderBox(textarea).height +
-          console.TEXTAREA_CHROME - 4;
+    textarea.style.height = height + 'px';
+  }
 
-    // We run into a problem when the row count would put the textarea at a
-    // size larger than our "max size" so at that point we have to roll back
-    // the row count and turn on scrolling.
+  // Don't let height exceed content area size, and adjust overflow when we
+  // have to truncate the height due to extra large input (from paste etc).
+  height = height + console.TEXTAREA_CHROME;
+  height = Math.min(height, max);
+  height = Math.max(height, console.TEXTAREA_LINEHEIGHT +
+      console.TEXTAREA_CHROME);
+  if (height == max) {
+    textarea.style.overflow = 'auto';
+  } else {
     textarea.style.overflow = 'hidden';
-    var currentHeight = height;
-    while ((height > max) && (rows > 0)) {
-      rows -= 1;
-      textarea.setAttribute('rows', rows);
-      height = su.elementGetBorderBox(textarea).height +
-          console.TEXTAREA_CHROME - 4;
-      if (height == currentHeight) {
-        break;
-      }
-      textarea.style.overflow = 'scroll';
-    }
   }
 
   // Update the containing footer height and the textarea will update its
@@ -448,7 +433,7 @@ console.appendContent = function(output, metadata) {
   var str = su.trimWhitespace(content.innerHTML);
   metadata = metadata || {};
   var type = metadata['type'] || 'other';
-  
+
   // We do all xml markup only here:
   // Prepare all <,> for xml, except if the syntax highlighter does it for us.
   if ( !/ruby/.test(type) ) {
@@ -462,7 +447,7 @@ console.appendContent = function(output, metadata) {
     backtrace = backtrace.join('<br>');
     // Shorten long file paths to make it easier to read.
     backtrace = backtrace.replace(/((?:[A-Z]\:|\/)[^\:]+)/g, function(filepath){
-	    // Truncate the Plugins folder, or as fallback keep only the filename.
+      // Truncate the Plugins folder, or as fallback keep only the filename.
       var relpath = /\/[Pp]lugins\//.test(filepath)? filepath.replace(/^.*\/[Pp]lugins\//,"") : filepath.match(/[^\/]+$/);
       if(relpath == filepath){ return filepath };
       var truncated = '<a onclick="this.innerHTML=(this.innerHTML!=\'…\')? \'…\' : \'' + filepath.replace("/"+relpath,"") + '\'">…</a>/';
@@ -471,7 +456,7 @@ console.appendContent = function(output, metadata) {
 
     str += '<div class="message ' + type + ' ui-collapsible-panel collapsed">' +
       '<div class="ui-collapsible-header" ' +
-      'onclick="console.toggleClass(this.parentNode, \'collapsed\')" >' +
+      'onclick="su.toggleClass(this.parentNode, \'collapsed\')" >' +
       output + '</div>' +
       '<div class="ui-collapsible-content">' + backtrace + '</div>' +
       '</div>';
@@ -487,7 +472,7 @@ console.appendContent = function(output, metadata) {
   }
   // Anything else.
   else {
-	  // Highlight Ruby code.
+    // Highlight Ruby code.
     if ( /ruby/.test(type) && su.isDefined(hljs) ) {
       output = '<pre><code>' + hljs.highlight('ruby', output).value + '</code></pre>';
     };
@@ -499,22 +484,6 @@ console.appendContent = function(output, metadata) {
   setTimeout(function() {
     su.scrollToEnd(content);
     }, 0);
-};
-
-
-// TODO: Place this function somewhere where it fits well.
-/**
- * Toggles a class on an HTMLElement.
- */
-console.toggleClass = function(element, className, value) {
-  var r = new RegExp("(^\\s*|\\s*\\b)" + className + "(\\b|$)");
-  if (value==null) { var value = !r.test(element.className) };
-  if (value) {
-    element.className += (element.className ? ' ' : '') + className;
-  }
-  else {
-    element.className = element.className.replace(r, "");
-  };
 };
 
 
@@ -742,16 +711,10 @@ console.toggleColorScheme = function(evt) {
   if (su.notValid(elem)) {
     return;
   }
-  var current = elem.getAttribute('class') || elem.className;
-  if (current == 'reverse') {
-    console.invert_ = false;
-    su.removeClass(elem, 'reverse');
-    su.removeClass('content', 'reverse');
-  } else {
-    console.invert_ = true;
-    su.addClass(elem, 'reverse');
-    su.addClass('content', 'reverse');
-  }
+
+  console.invert_ = !su.hasClass(elem, 'reverse');
+  su.toggleClass(elem, 'reverse', console.invert_);
+  su.toggleClass('content', 'reverse', console.invert_);
 
   return;
 };
@@ -793,11 +756,9 @@ console.handleGetConfigComplete = function(queryid) {
     // work here we actually set the value inverted from what we want to end
     // up with and the toggle will take it from there.
     if (console.config.inverse) {
-      $('invert').removeAttribute('class');
-      $('invert').className = '';
+      su.removeClass('invert', 'reverse');
     } else {
-      $('invert').setAttribute('class', 'reverse');
-      $('invert').className = 'reverse';
+      su.addClass('invert', 'reverse');
     }
     console.toggleColorScheme();
 
@@ -898,7 +859,7 @@ console.handleKeyDown = function(evt, opt_manualKeycode) {
         return;
       }
       break;
-      
+
     case su.ARROW_DOWN_KEY:
       var caretPosition = console.getCaretPosition($('command'));
       var parts = $('command').value.split(/\n/);
@@ -1043,6 +1004,19 @@ su.getEventTarget = function(opt_evt) {
 };
 
 /**
+ * Test whether an element has a CSS class.
+ * @param {string|Element} elementOrId The element or element ID to find.
+ * @param {string} className The class name to test.
+ */
+su.hasClass = function(elementOrId, className) {
+  var elem = $(elementOrId);
+  if (su.notValid(elem)) {
+    return;
+  }
+  return new RegExp("(^|\\b)" + className + "(\\b|$)").test(elem.className);
+}
+
+/**
  * Adds a CSS class name to an element, ensuring it is only present once.
  * @param {string|Element} elementOrId The element or element ID to find.
  * @param {string} className The class name to remove.
@@ -1053,7 +1027,7 @@ su.addClass = function(elementOrId, className) {
     return;
   }
 
-  var classes = su.ifInvalid(elem.getAttribute('class'), '');
+  var classes = su.ifInvalid(elem.getAttribute('class') || elem.className, '');
   var parts = classes.split(' ');
   for (var i = 0; i < parts.length; i++) {
     if (parts[i] == className) {
@@ -1077,7 +1051,7 @@ su.removeClass = function(elementOrId, className) {
     return;
   }
 
-  var classes = su.ifInvalid(elem.getAttribute('class'), '');
+  var classes = su.ifInvalid(elem.getAttribute('class') || elem.className, '');
   var parts = classes.split(' ');
   for (var i = 0; i < parts.length; i++) {
     if (parts[i] == className) {
@@ -1090,6 +1064,26 @@ su.removeClass = function(elementOrId, className) {
   elem.setAttribute('class', str);
   elem.className = str;
 };
+
+/**
+ * Toggle a CSS class from an element.
+ * @param {string|Element} elementOrId The element or element ID to find.
+ * @param {string} className The class name to toggle.
+ */
+su.toggleClass = function(elementOrId, className, value) {
+  var elem = $(elementOrId);
+  if (su.notValid(elem)) {
+    return;
+  }
+  if(value==null){
+    var value = !su.hasClass(elem, className);
+  }
+  if(value){
+    su.addClass(elem, className);
+  } else{
+    su.removeClass(elem, className);
+  }
+}
 
 /**
  * Scrolls an element to position the last of it's child content so that it
