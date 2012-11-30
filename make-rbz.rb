@@ -10,17 +10,24 @@
 # Usage:
 # ruby make-rbz.rb
 # Options:
-# => --o [path]
-#   sets the output for the RBZ file. should include the .rbz extension
+# => --o <name>
+#   sets the output file name for the RBZ file. Default is the repo name
 #   eg ruby make-rbz --o myScript.rbz
-# => -- s [path]
+# => --p <path>
+#   sets the output directory for the RBZ file. Default is the current working
+#   directory
+# => --d [prefix]
+#   sets the output file name for the RBZ file to be a combination of the given
+#   prefix and the value from `git describe`. If a prefix is not given, it is
+#   assumed to be the repo name
+# => --s <path>
 #   sets the source path for files to be added to the RBZ file. This path will
 #   treated as if it were the "plugins" folder - it will not be included in the
 #   RBZ but all of its contents will
 # => -v
 #   activate verbose mode. All added files will be printed to STDOUT
 # => -f
-#   force overwrite. This will remove the output path is it already exists
+#   force overwrite. This will overwrite the output file is it already exists
 # => -c
 #   activate zip compression
 ###############################################################################
