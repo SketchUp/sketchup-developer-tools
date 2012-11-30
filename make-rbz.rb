@@ -44,20 +44,29 @@ require 'zlib'
 
 LEVEL = Zlib::BEST_COMPRESSION
 OPTIONS = {
-    :output => 'sketchup-developer-tools.rbz',
+    :output_path => '.',
+    :output_file => nil,
     :source => 'src',
     :verbose => false,
     :force => false,
     :compress => false
 }
+FILE_NAME_FORBIDDEN = /[\<\>\:\"\/\\\|\?\*\/]/
+REPO_NAME = File.basename(File.dirname(__FILE__))
 
 OptionParser.new {|opts|
     opts.banner = "Usage : ruby #{File.basename(__FILE__)} [OPTIONS]"
-    opts.on("--o [path]") {|v|
-        OPTIONS[:output] = v
+    opts.on("--p <path>") {|v|
+        OPTIONS[:output_path] = v
     }
-    opts.on("--s [path]") {|v|
-        OPTIONS[:source] = v
+    opts.on("--o <name>") {|file_name|
+        unless OPTIONS[:output_name].nil?
+            abort("--o cannot be used with -d")
+        end
+        OPTIONS[:output_name] = file_name.gsub(FILE_NAME_FORBIDDEN, '-')
+    }
+    opts.on("--s <path>") {|path|
+        OPTIONS[:source] = path
     }
     opts.on("-v") {|v|
         OPTIONS[:verbose] = v
@@ -68,14 +77,36 @@ OptionParser.new {|opts|
     opts.on("-c") {|v|
         OPTIONS[:compress] = v
     }
+    opts.on("--d [prefix]") {|prefix|
+        unless OPTIONS[:output_name].nil?
+            abort("--o cannot be used with -d")
+        end
+        begin
+            desc = `git describe`.strip()
+        rescue => e
+            abort("Error reading repo description")
+        end
+        desc.gsub!(FILE_NAME_FORBIDDEN, '-')
+        prefix = (prefix || REPO_NAME).gsub(FILE_NAME_FORBIDDEN, '-')
+        OPTIONS[:output_file] = prefix + '_' + desc
+    }
 }.parse!
+
+OPTIONS[:output_file] ||= REPO_NAME
+OPTIONS[:output] = File.join(OPTIONS[:output_path], OPTIONS[:output_file])
+if File.extname(OPTIONS[:output]).downcase() != '.rbz'
+    OPTIONS[:output] += '.rbz'
+end
 
 
 if File.exists?(OPTIONS[:output])
     if OPTIONS[:force]
         File.delete(OPTIONS[:output])
     else
-        raise IOError.new("target output file already exists. use -f to overwrite")
+        raise abort([
+            "target output file already exists.",
+            "Use -f to overwrite #{OPTIONS[:output]}"
+        ].join(''))
     end
 end
 
