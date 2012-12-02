@@ -448,7 +448,7 @@ console.appendContent = function(output, metadata) {
     // Shorten long file paths to make it easier to read.
     backtrace = backtrace.replace(/((?:[A-Z]\:|\/)[^\:]+)/g, function(filepath){
       // Truncate the Plugins folder, or as fallback keep only the filename.
-      var relpath = /\/[Pp]lugins\//.test(filepath)? filepath.replace(/^.*\/[Pp]lugins\//,"") : filepath.match(/[^\/]+$/);
+      var relpath = /[\/\\][Pp]lugins[\/\\]/.test(filepath)? filepath.replace(/^.*[\/\\][Pp]lugins[\/\\]/,"") : filepath.match(/[^\/]+$/);
       if(relpath == filepath){ return filepath };
       var truncated = '<a onclick="this.innerHTML=(this.innerHTML!=\'…\')? \'…\' : \'' + filepath.replace("/"+relpath,"") + '\'">…</a>/';
       return '<span class="filepath" title="' + filepath + '">' + truncated + relpath + '</span>';
