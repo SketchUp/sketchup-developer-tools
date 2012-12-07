@@ -47,7 +47,7 @@ class Console
     :reload => /[pP]lugins/,             # reload plugins only normally
     :shiftexec => false,              # execute on Shift-Enter, not enter
 
-    :toolroot => 'plugins/Developer', # where is extension installed?
+    :toolroot => 'plugins/sketchup-developer-tools', # where is extension installed?
     :toolhelp => 'http://code.google.com/apis/sketchup/docs/tutorial_console.html',
     :usercss => '',                   # user-supplied css overlay file
     :userjs => '',                    # user-supplied JS overlay file
