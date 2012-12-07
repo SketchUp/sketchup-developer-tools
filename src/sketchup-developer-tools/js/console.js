@@ -479,6 +479,11 @@ console.appendContent = function(output, metadata) {
     str += '<div class="message ' + type + '">' + output + '</div>';
   }
 
+  // Replace white space at line beginnings by entity references (because of
+  // incomplete innerHTML implementation in IE). Be careful not to touch spaces
+  // inside xml tags.
+  str = str.replace(/(^|\n|\>)\s/g, "$1&nbsp;");
+
   // Append to the console content.
   content.innerHTML = str;
   setTimeout(function() {
