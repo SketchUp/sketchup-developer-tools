@@ -266,7 +266,7 @@ class TC_Entity < Test::Unit::TestCase
                  'Failed in test_to_s_edge')
   end
 
-  # Test that the edge returns the expected type.
+  # Test that the construction line returns the expected type.
   def test_to_s_cline
     erase_all()
     model = Sketchup.active_model
@@ -275,7 +275,7 @@ class TC_Entity < Test::Unit::TestCase
                  'Failed in test_to_s_cline')
   end
 
-  # Test that the edge returns the expected type.
+  # Test that the text returns the expected type.
   def test_to_s_text
     erase_all()
     model = Sketchup.active_model
@@ -330,7 +330,7 @@ class TC_Entity < Test::Unit::TestCase
                  'Failed in test_typename_edge')
   end
 
-  # Test that the edge returns the expected type.
+  # Test that the construction line returns the expected type.
   def test_typename_cline
     erase_all()
     model = Sketchup.active_model
@@ -339,7 +339,7 @@ class TC_Entity < Test::Unit::TestCase
                  'Failed in test_typename_cline')
   end
 
-  # Test that the edge returns the expected type.
+  # Test that the text returns the expected type.
   def test_typename_text
     erase_all()
     model = Sketchup.active_model
