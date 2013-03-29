@@ -430,7 +430,7 @@ console.updateCommandCell = function(aValue) {
  */
 console.appendContent = function(output, metadata) {
   var content = $('content');
-  var str = su.trimWhitespace(content.innerHTML);
+  var newStr = "";
   metadata = metadata || {};
   var type = metadata['type'] || 'other';
 
@@ -454,7 +454,7 @@ console.appendContent = function(output, metadata) {
       return '<span class="filepath" title="' + filepath + '">' + truncated + relpath + '</span>';
     });
 
-    str += '<div class="message ' + type + ' ui-collapsible-panel collapsed">' +
+    newStr += '<div class="message ' + type + ' ui-collapsible-panel collapsed">' +
       '<div class="ui-collapsible-header" ' +
       'onclick="su.toggleClass(this.parentNode, \'collapsed\')" >' +
       output + '</div>' +
@@ -466,9 +466,9 @@ console.appendContent = function(output, metadata) {
     if ( /ruby/.test(type) && su.isDefined(hljs) ) {
       output = '<pre><code>' + hljs.highlight('ruby', output).value + '</code></pre>'
     };
-    str += '<span class="message ' + type + '">' + output + '</span>';
+    newStr += '<span class="message ' + type + '">' + output + '</span>';
     // Except of print, everything else creates a new line after it.
-    if ( !/print/.test(type) ) {str += '<br/>' };
+    if ( !/print/.test(type) ) {newStr += '<br/>' };
   }
   // Anything else.
   else {
@@ -476,16 +476,17 @@ console.appendContent = function(output, metadata) {
     if ( /ruby/.test(type) && su.isDefined(hljs) ) {
       output = '<pre><code>' + hljs.highlight('ruby', output).value + '</code></pre>';
     };
-    str += '<div class="message ' + type + '">' + output + '</div>';
+    newStr += '<div class="message ' + type + '">' + output + '</div>';
   }
 
   // Replace white space at line beginnings by entity references (because of
   // incomplete innerHTML implementation in IE). Be careful not to touch spaces
   // inside xml tags.
-  str = str.replace(/(^|\n|\>)\s/g, "$1&nbsp;");
+  newStr = newStr.replace(/(^|\n|\>)\s/g, "$1&nbsp;");
 
   // Append to the console content.
-  content.innerHTML = str;
+  var str = su.trimWhitespace(content.innerHTML);
+  content.innerHTML = str + newStr;
   setTimeout(function() {
     su.scrollToEnd(content);
     }, 0);
