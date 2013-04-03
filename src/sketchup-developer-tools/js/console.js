@@ -326,7 +326,7 @@ console.execCommandCell = function() {
 
   // Anything starting with a \ is a command line, not an eval buffer.
   if (cmd.indexOf('\\') == 0) {
-    console.appendContent(cmd, {'type': 'command input'});
+    console.appendContent(command, {'type': 'command input'});
     var parts = cmd.slice(1).split(' ');
     cmd = parts[0];
     var fname = 'exec_' + cmd;
@@ -345,7 +345,7 @@ console.execCommandCell = function() {
   }
 
   // Send the command to appendContent and let it handle all markup.
-  console.appendContent(cmd, {'type': 'ruby input'});
+  console.appendContent(command, {'type': 'ruby input'});
 
   // Ask for the Ruby to be eval'd and the result logged/quiet as needed.
   su.callRuby('do_exec', {
