@@ -2,8 +2,8 @@
 #
 # Copyright:: Copyright 2012 Trimble Navigation Ltd.
 # License:: Apache License, version 2.0
-# Original Author:: Matt Lowrie 
-# Author: Simone Nicolo 
+# Original Author:: Matt Lowrie
+# Author: Simone Nicolo
 #
 # SketchUp plugin that tests the Ruby API.
 #
@@ -79,7 +79,7 @@ class TestUpSketchUp
   #
   #
   def launch_gui()
-    
+
     # Check if we're running on Mac so we can handle WebDialog differences.
     @is_mac = Object::RUBY_PLATFORM =~ /darwin/
 
@@ -302,7 +302,7 @@ class TestUpSketchUp
       # This dumps the raw test case output into a toggable display element
       # First we need to escape double-quotes and remove new lines to avoid
       # javascript parsing errors
-      raw_output = lines.join('<br/>').gsub(/"/, '\"').gsub(/\n/, '')
+      raw_output = lines.join('<br/>').inspect[1...-1].gsub(/\n/, '')
 
       # This color codes some of the output for easy scanning
       raw_output = raw_output.gsub(/\d+\) Error:/) { |m|
