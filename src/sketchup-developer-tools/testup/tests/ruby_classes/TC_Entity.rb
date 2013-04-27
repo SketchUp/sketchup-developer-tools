@@ -266,22 +266,22 @@ class TC_Entity < Test::Unit::TestCase
                  'Failed in test_to_s_edge')
   end
 
-  # Test that the edge returns the expected type.
+  # Test that the construction line returns the expected type.
   def test_to_s_cline
     erase_all()
     model = Sketchup.active_model
-    edge = model.entities.add_cline([0,0,0], [100,100,100])
-    assert_equal(edge.to_s.index('Sketchup::ConstructionLine'), 2,
+    cline = model.entities.add_cline([0,0,0], [100,100,100])
+    assert_equal(cline.to_s.index('Sketchup::ConstructionLine'), 2,
                  'Failed in test_to_s_cline')
   end
 
-  # Test that the edge returns the expected type.
-  def test_to_s_cline
+  # Test that the text returns the expected type.
+  def test_to_s_text
     erase_all()
     model = Sketchup.active_model
-    edge = model.entities.add_text "This is a Test", [0,0,0]
-    assert_equal(edge.to_s.index('Sketchup::Text'), 2,
-                 'Failed in test_to_s_cline')
+    text = model.entities.add_text "This is a Test", [0,0,0]
+    assert_equal(text.to_s.index('Sketchup::Text'), 2,
+                 'Failed in test_to_s_text')
   end
 
 
@@ -330,22 +330,22 @@ class TC_Entity < Test::Unit::TestCase
                  'Failed in test_typename_edge')
   end
 
-  # Test that the edge returns the expected type.
+  # Test that the construction line returns the expected type.
   def test_typename_cline
     erase_all()
     model = Sketchup.active_model
-    edge = model.entities.add_cline([0,0,0], [100,100,100])
-    assert_equal(edge.typename.index('Sketchup::ConstructionLine'),
-                 'ConstructionLine', 'Failed in test_typename_cline')
+    cline = model.entities.add_cline([0,0,0], [100,100,100])
+    assert_equal(cline.typename, 'ConstructionLine',
+                 'Failed in test_typename_cline')
   end
 
-  # Test that the edge returns the expected type.
-  def test_typename_cline
+  # Test that the text returns the expected type.
+  def test_typename_text
     erase_all()
     model = Sketchup.active_model
-    edge = model.entities.add_text "This is a Test", [0,0,0]
-    assert_equal(edge.typename, 'Text',
-                 'Failed in test_typename_cline')
+    text = model.entities.add_text "This is a Test", [0,0,0]
+    assert_equal(text.typename, 'Text',
+                 'Failed in test_typename_text')
   end
 
 
@@ -774,13 +774,13 @@ class TC_Entity < Test::Unit::TestCase
                  'Failed in test_set_attribute_string')
   end
 
-  def test_set_attribute_float
+  def test_set_attribute_int
     model = Sketchup.active_model
     entities = model.active_entities
     edge = entities.add_line([0,0,0],[9,9,9])
-    status = edge.set_attribute "testdictionary", "test", 5.5
-    assert_equal(status, 5.5,
-                 'Failed in test_set_attribute_float')
+    status = edge.set_attribute "testdictionary", "test", 5
+    assert_equal(status, 5,
+                 'Failed in test_set_attribute_int')
   end
 
   def test_set_attribute_float

@@ -15,7 +15,7 @@ Sketchup::require 'sketchup-developer-tools/testup/testup.rb'
 # If we've never loaded the tools extension then locate the top-level
 # SketchUp Tools menu bar and inject a "Developer" submenu to host any
 # menus related to tool submodules.
-if (not $devtools_loaded) 
+if (not $devtools_loaded)
   $devtools_submenu = UI.menu("Tools").add_submenu(
     $devl_strings.GetString("Developer"))
   $devtools_loaded = true
@@ -23,14 +23,14 @@ end
 
 if (not $devtools_console_loaded)
   console_cmd = UI::Command.new($devl_strings.GetString("Console")) {
-    Developer::Console.new().show 
+    Developer::Console.new().show
   }
   console_cmd.tooltip = $devl_strings.GetString("Developer Console")
   console_cmd.status_bar_text = $devl_strings.GetString("Open Developer Console")
   console_cmd.menu_text = $devl_strings.GetString("Console")
   $devtools_submenu.add_item(console_cmd)
 
-  testup_cmd = UI::Command.new($devl_strings.GetString("Console")) {
+  testup_cmd = UI::Command.new($devl_strings.GetString("TestUp")) {
     if $testup == nil
       $testup = TestUp.new
     end

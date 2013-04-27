@@ -362,7 +362,7 @@ html, body {
   background: -webkit-linear-gradient(top,  #fbf8ef 0%,#dcd8d0 100%); /* Chrome10+,Safari5.1+ */
   background: -o-linear-gradient(top,  #fbf8ef 0%,#dcd8d0 100%); /* Opera 11.10+ */
   background: -ms-linear-gradient(top,  #fbf8ef 0%,#dcd8d0 100%); /* IE10+ */
-  background: linear-gradient(to bottom,  #fbf8efd 0%,#dcd8d0 100%); /* W3C */
+  background: linear-gradient(to bottom,  #fbf8ef 0%,#dcd8d0 100%); /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fbf8ef', endColorstr='#dcd8d0',GradientType=0 ); /* IE6-9 */
 }
 
