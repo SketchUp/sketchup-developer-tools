@@ -47,7 +47,7 @@ class Console
     :reload => /[pP]lugins/,             # reload plugins only normally
     :shiftexec => false,              # execute on Shift-Enter, not enter
 
-    :toolroot => 'plugins/Developer', # where is extension installed?
+    :toolroot => File.dirname(File.dirname(__FILE__)), # where is extension installed?
     :toolhelp => 'http://code.google.com/apis/sketchup/docs/tutorial_console.html',
     :usercss => '',                   # user-supplied css overlay file
     :userjs => '',                    # user-supplied JS overlay file
@@ -371,8 +371,8 @@ class Console
     # where the default console will appear etc. Since we do this with each
     # new instance initialization it's possible to update the configuration
     # before each new console creation.
-    path = Sketchup.find_support_file 'config.rb', @@config[:toolroot]
-    if path
+    path = File.join(@@config[:toolroot], 'config.rb')
+    if File.file?(path)
       load path
     end
 
@@ -406,8 +406,8 @@ class Console
     @dialog.min_width = @config[:minwidth]
 
     # Load any stored history so it's available to the console instance.
-    path = Sketchup.find_support_file @config[:history], @@config[:toolroot]
-    if (path)
+    path = File.join(@@config[:toolroot], @config[:history])
+    if File.file?(path)
       begin
         load path
       rescue Exception => e
@@ -416,8 +416,8 @@ class Console
     end
 
     # Load any custom ruby overlays the user wants for customization.
-    path = Sketchup.find_support_file @config[:userrb], @@config[:toolroot]
-    if (path)
+    path = File.join(@@config[:toolroot], @config[:userrb])
+    if File.file?(path)
       begin
         load path
       rescue Exception => e
@@ -435,18 +435,18 @@ class Console
 
     # Update configuration to have full paths for JS-relevant parameters. We
     # do this before showing the dialog so it's
-    path = Sketchup.find_support_file @config[:usercss], @@config[:toolroot]
-    if (path)
+    path = File.join(@@config[:toolroot], @config[:usercss])
+    if File.file?(path)
       @config[:usercss] = path
     end
-    path = Sketchup.find_support_file @config[:userjs], @@config[:toolroot]
-    if (path)
+    path = File.join(@@config[:toolroot], @config[:userjs])
+    if File.file?(path)
       @config[:userjs] = path
     end
 
     # Update paths for help file(s) we want to display.
-    path = Sketchup.find_support_file(@config[:toolhelp], @@config[:toolroot])
-    if (path)
+    path = File.join(@@config[:toolroot], @config[:toolhelp])
+    if File.file?(path)
       @config[:toolhelp] = path
     end
 
