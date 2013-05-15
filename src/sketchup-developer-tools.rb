@@ -8,7 +8,7 @@ require 'sketchup.rb'
 require 'extensions.rb'
 require 'LangHandler.rb'
 
-version = '0.0.1'
+version = '0.1.0'
 
 # Put translation object where all Developer tools can find it.
 $devl_strings = LanguageHandler.new("Developer.strings")
