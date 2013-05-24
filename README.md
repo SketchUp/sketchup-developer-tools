@@ -11,7 +11,7 @@ More tools to come. Want to contribute? Please do!
 The latest and greatest (definitely still in beta) is available as an RBZ.
 Download the file from this url:
 
-https://github.com/SketchUp/sketchup-developer-tools/raw/master/sketchup-developer-tools-0.0.1.rbz
+http://extensions.sketchup.com/content/sketchup-developer-tools
 
 Then inside SketchUp, select Preferences > Extensions > Install Extension and select the RBZ file you just downloaded. Voila! SketchUp installs the extension.
 You'll find a new menu under Tools > Developer with all the goodies.
