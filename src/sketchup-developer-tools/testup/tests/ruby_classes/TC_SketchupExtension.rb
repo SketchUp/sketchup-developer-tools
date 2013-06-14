@@ -46,6 +46,9 @@ class TC_SketchupExtension < Test::Unit::TestCase
       $testup_dc_extension_noload.creator = 'testup_creator_noload'
       $testup_dc_extension_noload.copyright = 'testup_copyright_noload'
       Sketchup.register_extension $testup_dc_extension_noload, false
+      su_examples = Sketchup.find_support_file('Plugins') + '/su_examples'
+      $test_su_examples_absent = !(File.directory? su_examples)
+
     end
   end
 
@@ -60,6 +63,12 @@ class TC_SketchupExtension < Test::Unit::TestCase
     $testup_dc_extension_noload.copyright = 'testup_copyright_noload';
     $testup_dc_extension_autoload.creator = 'testup_creator_autoload';
     $testup_dc_extension_noload.creator = 'testup_creator_noload';
+  end
+
+  def examples_not_installed(test_name)
+    return test_name + ' can only be run if Examples Extension is loaded ' +
+        'from Extension Warehouse; search on Example Ruby Scripts by The ' +
+        'SketchUp Team, and install'
   end
 
   def test_name
@@ -164,6 +173,11 @@ class TC_SketchupExtension < Test::Unit::TestCase
   end
 
   def test_check
+    if $test_su_examples_absent == true
+      raise examples_not_installed('test_check')
+      return
+    end
+
     if $test_load_has_run == true
       raise('test_load can only be run once per SketchUp session.')
       return
@@ -171,7 +185,7 @@ class TC_SketchupExtension < Test::Unit::TestCase
 
     # Create an extension and register it not to load on start.
     my_extension = SketchupExtension.new('testup_will_load' + Time.new.to_s,
-        'Examples/animation.rb')
+        'su_examples/animation.rb')
 
     Sketchup.register_extension my_extension, false
 
@@ -195,6 +209,11 @@ class TC_SketchupExtension < Test::Unit::TestCase
   end
 
   def test_register
+    if $test_su_examples_absent == true
+      raise examples_not_installed('test_register')
+      return
+    end
+
     if $test_register_has_run == true
       raise('test_register can only be run once per SketchUp session.')
       return
@@ -205,7 +224,7 @@ class TC_SketchupExtension < Test::Unit::TestCase
     # always re-registers.
     name = 'testup_to_register' + Time.new.to_s
     reg_extension = SketchupExtension.new(name,
-        'Examples/box.rb')
+        'su_examples/box.rb')
 
     assert_equal(false, reg_extension.loaded?,
                  'reg_extension.loaded?')
@@ -254,12 +273,17 @@ class TC_SketchupExtension < Test::Unit::TestCase
   end
 
   def test_check_success
+    if $test_su_examples_absent == true
+      raise examples_not_installed('test_check_success')
+      return
+    end
+
     if $test_load_success_has_run == true
       raise('test_load_success can only be run once per SketchUp session.')
       return
     end
     loadable_extension = SketchupExtension.new('loadable_extension',
-        'Examples/attributes.rb')
+        'su_examples/attributes.rb')
 
     result = loadable_extension.check;
 
