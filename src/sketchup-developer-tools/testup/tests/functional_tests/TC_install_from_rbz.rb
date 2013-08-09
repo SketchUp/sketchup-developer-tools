@@ -16,7 +16,8 @@ class TC_install_from_rbz < Test::Unit::TestCase
 
   def setup
     @supporting_data_dir = __FILE__.slice(0, __FILE__.rindex('.'))
-    @examples_path = Sketchup.find_support_file('examples.rb', 'plugins')
+    # examples.rb is no longer installed by default. Use su_webtextures.
+    @examples_path = Sketchup.find_support_file('su_webtextures.rb', 'plugins')
     @plugins_dir = @examples_path.slice(0, @examples_path.rindex('/'))
   end
 

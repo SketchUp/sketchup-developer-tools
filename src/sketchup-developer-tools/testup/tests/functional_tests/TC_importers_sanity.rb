@@ -214,98 +214,36 @@ class TC_importers_sanity < Test::Unit::TestCase
   def set_mac_options
 
     # Set correct plist name depending on which version of SU is being run.
-    # Note: until http://b/issue?id=2439148 is fixed, the plist name will be
-    # wrong when running SU Free.
-    plist_name = 'com.google.sketchuppro'
-    plist_name = 'com.google.sketchupfree' if @model.get_product_family == 1
+    # Note: fixed for 2013.  Changes required a rewrite of this function.
+    plist_name = 'defaults write com.sketchup.SketchUp '
 
-    # For each importer, create a hash containing the key names and key values
-    # associated with each importer option
-    importer_settings = Hash.new()
-    importer_settings['3ds'] = {
-        'SketchUp.Preferences.Import3DS.Units' => 1,
-        'SketchUp.Preferences.Import3DS.MergeCoplanar' => 0,
-        'SketchUp.Preferences.Import3DS.SoftEdges' => 0}
-    importer_settings['dwg'] = {
-        'SketchUp.Preferences.ImportMergeFaces' => 0,
-        'SketchUp.Preferences.ImportOrientFaces' => 1,
-        'SketchUp.Preferences.ImportDwgUnits' => 1,
-        'SketchUp.Preferences.DwgImportPreserveOrigin' => 0}
-    importer_settings['dae'] = {
-        'com.google.sketchup.import.dae.ImportMergeCoplanarFaces' => 0,
-        'com.google.sketchup.import.dae.ImportValidateDAE' => 1}
-    importer_settings['dem'] = {
-        'SketchUp.Preferences.ExportDEM.MaxError' =>10,
-        'SketchUp.Preferences.ExportDEM.GenTexture' => 0,
-        'SketchUp.Preferences.ExportDEM.HeightScale' => 1,
-        'SketchUp.Preferences.ExportDEM.MaxPoints' => 250}
+    # Prefs changed so that all 4 for DWG are in com.sketchup.SketchUp
+    # Preferences.  In order to not write out the entire dictionary, we'll do a
+    # defaults write com.sketchup.SketchUp Preferences -dict-add, and 
+    # we can do this all in one call, eliminating a need for hash.
+    importer_settings = Array.new()
+    importer_settings.push(%Q!"3DS Importer"! + ' -dict-add FileUnits 1' +
+      ' MergeCoplanar 0 SoftEdges 0')
+    importer_settings.push("Preferences -dict-add ImportMergeFaces 0" +
+      ' ImportOrientFaces 1 ImportDwgUnits 1 DwgImportPreserveOrigin 0')
+    importer_settings.push(%Q!"Dae Importer"! + ' -dict-add ' + 
+        'ImportMergeCoplanarFaces 0 ImportValidateDAE 1')
+    importer_settings.push(%Q!"DEM Importer"! + ' -dict-add ' + 
+        'GenTexture 0 MaxPoints 250')
 
-    # Set the name of a temp file we will use in the next loop
-    temp_file =  "#{@supporting_data_dir}/temp_key_file"
-
-    # Initialize a counter we will use in the next loop
-    nr_different_keys = 0
-
-    # Loop through the array of importers that need options to be set
-    @arr_of_importers_with_options.each do |importer_extension|
-
-      # Loop through the hash containing the importer specific key names and
-      # key values
-      importer_settings[importer_extension].each do |key, value|
-
-        # Determine if the current value in the plist is different than the
-        # value we want to set.  If they are different, we will need to
-        # prompt the user to close/reopen SU.  The following code
-        # will immediately write our new values to the plist.  SU's
-        # importers though, don't register that new values have been
-        # set until we close/reopen the app.  If we don't do this step,
-        # our test could give a false negative.
-
-        # Create a variable to hold the current plist key value
-        current_key_value = nil
-
-        # Compose a string that, when passed to the system, will read the
-        # current key value and pipe the output to our temp file.  If we don't
-        # create a temp file, the defaults read command would simply
-        # return true or false vs giving us the key value.
-        read_command="defaults read #{plist_name}#{@su_version} " +
-                       "#{key} > '#{temp_file}'"
-
-        # Pass the command string to the system to create the temp file
-        system(read_command)
-
-        # Set our current key value by opening the temp file and reading
-        # the first line
-        f = File.open temp_file
-        first_line = f.readlines[0]
-        current_key_value = first_line.chomp if first_line != nil
-        f.close
-
-        # Compare the current key value to the value we want to set.  If they
-        # are different, increment a counter which keeps track of the number
-        # of keys that are different.
-        if current_key_value.to_s != value.to_s
-           nr_different_keys += 1
-        end
-
-        # Compose a string that, when passed to the system, will write to the
-        # plist, the key values we want to set.
-        write_command = "defaults write #{plist_name}#{@su_version} " +
-                       "#{key} #{value}"
-
-        # Pass the command to the system to write our new values to the plist
-        system(write_command)
-      end
+    importer_settings.each do |defaults|
+      system(plist_name + defaults)
     end
 
     # If we found we needed to make changes to any of the importer options,
     # raise an error prompting the user to exit and relaunch SU.
-    if nr_different_keys > 0
-      raise RuntimeError, "\n TestUp needed to set some import preferences
-                    that were different than what you had previously. For them
-                    to take effect, you need to exit SU and then rerun this
-                    test. \n"
-    end
+    # Todo(bjanzen) - do the read and notify user that a restart is necessary.
+    #if nr_different_keys > 0
+    #  raise RuntimeError, "\n TestUp needed to set some import preferences
+    #                that were different than what you had previously. For them
+    #                to take effect, you need to exit SU and then rerun this
+    #                test. \n"
+    #end
   end
 
 
@@ -423,7 +361,7 @@ class TC_importers_sanity < Test::Unit::TestCase
 
   # Method to import a file
   # The method includes logic for doing additional steps for the 3ds and skp
-  # importers
+  # importers. (dae as well due to a bug introduced in SketchUp 2013)
   #
   # Args:
   #   filename: name of file to be imported
@@ -437,15 +375,15 @@ class TC_importers_sanity < Test::Unit::TestCase
    Sketchup.active_model.import(filename.to_s, false)
 
    # This is a hack to make 3ds/skp import work.  The problem is that the 3ds
-   # and skp importers don't place the geometry in the model when imported.
-   # Instead, they import the geometry as a component that needs to be
-   # placed and until it is placed, no geometry shows up in the model. This
-   # code finds the top most definition based on expected name and inserts it
-   # into the model.  Note: for 3ds,this code only needs to be executed on Win
-   # as the Mac behaves differently, directly inserting the 3ds file.
-   #
-   # TODO(tricias): look for a better way to do this
-   if filename_extension == '3ds' and @platform == 'win'
+   # and skp (and with SketchUp 2013, dae) importers don't place the geometry 
+   # in the model when imported.  Instead, they import the geometry as a 
+   # component that needs to be placed and until it is placed, no geometry shows
+   # up in the model. This code finds the top most definition based on expected 
+   # name and inserts it into the model.  Note: for 3ds, this code only needs to 
+   # be executed on Win as the Mac behaves differently, directly inserting the 
+   # 3ds file.
+   # TODO: look for a better way to do this
+   if filename_extension == '3ds' # this is now Mac, too, in 2013:  and @platform == 'win'
      @defs.each do |item|
 
        # Find the top most definition which, for 3ds, has "skp" in the name
@@ -473,6 +411,11 @@ class TC_importers_sanity < Test::Unit::TestCase
          break
        end
      end
+   end
+   if filename_extension == 'dae'
+         point = Geom::Point3d.new 10,20,30
+         transform = Geom::Transformation.new point
+         instance = @entities.add_instance @defs[0], transform
    end
   end
 

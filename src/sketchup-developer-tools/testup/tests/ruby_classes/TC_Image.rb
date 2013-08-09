@@ -46,7 +46,18 @@ class TC_Image < Test::Unit::TestCase
     end
   end
 
+  def set_image(image_name)
+    model = Sketchup.active_model
+    path = Sketchup.find_support_file image_name, "Plugins" + 
+      "/su_dynamiccomponents/images"
+    pt = Geom::Point3d.new
+    entities = model.active_entities
+    return (entities.add_image path, pt, 300)
+  end   
+    
+
   # ----------------------------------------------------------------------------
+  #
   # @par Ruby Method:    Image.width
   # @file                rimage.cpp
   #
@@ -64,12 +75,7 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_width_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png",
-       "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      width = image.width
      if (width)
        UI.messagebox width
@@ -113,11 +119,7 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_set_size_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      UI.messagebox "Before Resize"
      size = image.size= 500,500
      if (size)
@@ -161,11 +163,7 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_explode_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      entitiesarray = image.explode
      if (entitiesarray)
        UI.messagebox entitiesarray
@@ -207,13 +205,9 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_transform_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
+     image = set_image "report_tool.png"
      point = Geom::Point3d.new 100,100,100
      t = Geom::Transformation.new point
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
      UI.messagebox "Before Move"
      image = image.transform! t
      if (image)
@@ -258,11 +252,7 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_set_height_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      UI.messagebox "Before adjustment"
      height = image.height = 400
      if (height)
@@ -307,11 +297,7 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_set_width_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      UI.messagebox "Before adjustment"
      width = image.width=400
      if (width)
@@ -354,11 +340,7 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_normal_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      vector = image.normal
      if (vector)
        UI.messagebox vector
@@ -402,12 +384,8 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_set_origin_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
+     image= set_image "report_tool.png"
      pt2 = Geom::Point3d.new 100,100,100
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
      UI.messagebox "Before Move"
      origin = image.origin=pt2
      if (origin)
@@ -451,11 +429,7 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_height_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      height = image.height
      if (height)
        UI.messagebox height
@@ -497,11 +471,7 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_zrotation_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      zrotation = image.zrotation
      if (zrotation)
        UI.messagebox zrotation
@@ -543,11 +513,7 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_path_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      path = image.path
      if (path)
        UI.messagebox path
@@ -590,11 +556,7 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_origin_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      origin = image.origin
      if (origin)
        UI.messagebox origin
@@ -637,11 +599,7 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_pixelheight_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      pixelheight = image.pixelheight
      if (pixelheight)
        UI.messagebox pixelheight
@@ -683,11 +641,7 @@ class TC_Image < Test::Unit::TestCase
   # Test the example code that we have in the API documentation.
   def test_pixelwidth_api_example
     assert_nothing_raised do
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png", "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      pixelwidth = image.pixelwidth
      if (pixelwidth)
        UI.messagebox pixelwidth
@@ -729,14 +683,9 @@ class TC_Image < Test::Unit::TestCase
    # Test the example code that we have in the API documentation.
    def test_transform_inplace_api_example
      assert_nothing_raised do
-       model = Sketchup.active_model
-       path = Sketchup.find_support_file "report_tool.png",
-         "Tools/DynamicComponents/images"
+       image = set_image "report_tool.png"
        point = Geom::Point3d.new 100,100,100
        t = Geom::Transformation.new point
-       pt = Geom::Point3d.new
-       entities = model.active_entities
-       image = entities.add_image path, pt, 300
        UI.messagebox "Before Move"
        image = image.transform! t
        if (image)
@@ -748,26 +697,16 @@ class TC_Image < Test::Unit::TestCase
    end
 
    def test_transform_inplace_edgecases
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png",
-       "Tools/DynamicComponents/images"
+     image = set_image "report_tool.png"
      point = Geom::Point3d.new 0,0,0
      t = Geom::Transformation.new point
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
      UI.messagebox "Before Move"
      image = image.transform! t
      assert_not_nil(image)
    end
 
    def test_transform_inplace_bad_params
-     model = Sketchup.active_model
-     path = Sketchup.find_support_file "report_tool.png",
-       "Tools/DynamicComponents/images"
-     pt = Geom::Point3d.new
-     entities = model.active_entities
-     image = entities.add_image path, pt, 300
+     image = set_image "report_tool.png"
      UI.messagebox "Before Move"
      assert_raise(TypeError) do
        image = image.transform! "bad params"
