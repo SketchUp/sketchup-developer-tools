@@ -16,7 +16,7 @@ require 'LangHandler.rb'
 # Make sure we load base which brings in bridge and common infrastructure.
 Sketchup::require 'sketchup-developer-tools/ruby/devl_base.rb'
 
-# Reopen the DeveloperTools module so our console class can be a part of
+# Reopen the Developer Tools module so our console class can be a part of
 # the overall tools module.
 #
 module Developer
@@ -48,7 +48,7 @@ class Console
     :shiftexec => false,              # execute on Shift-Enter, not enter
 
     :toolroot => File.dirname(File.dirname(__FILE__)), # where is extension installed?
-    :toolhelp => 'http://code.google.com/apis/sketchup/docs/tutorial_console.html',
+    :toolhelp => 'http://www.sketchup.com/intl/en/developer/docs/tutorial_console?csw=1',
     :usercss => '',                   # user-supplied css overlay file
     :userjs => '',                    # user-supplied JS overlay file
     :userrb => ''                     # user-supplied Ruby overlay file
