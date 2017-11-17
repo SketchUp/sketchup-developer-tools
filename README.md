@@ -1,3 +1,13 @@
+# Obsolete!
+
+This project is outdated. It will not function with SketchUp 2014 and older.
+
+* For a newer version of TestUp: https://github.com/SketchUp/testup-2
+* For a WebDialog console: https://github.com/Aerilius/sketchup-console-plus
+* For Ruby debugging tools: https://github.com/SketchUp/sketchup-ruby-debugger
+
+---
+
 # Welcome to SketchUp Developer Tools
 
 A SketchUp Ruby Extension that provides some tools to make developers' lives
